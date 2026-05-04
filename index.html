@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МПТ — Полный конспект</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: #2a3a55;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #10b981;
+  --warn: #f59e0b;
+  --text: #e2e8f0;
+  --text-muted: #64748b;
+  --red: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0f172a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#search {
+  flex: 1;
+  min-width: 200px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#search:focus { border-color: var(--accent); }
+#search::placeholder { color: var(--text-muted); }
+
+#filter {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.stats {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.stat-badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* MAIN */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* QUESTION CARD */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.question-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.q-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: center;
+}
+
+.type-badge {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.badge-interface { background: rgba(124,58,237,0.2); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+.badge-mcu { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+.badge-control { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+.badge-sensors { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+
+.q-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.chevron {
+  color: var(--text-muted);
+  font-size: 18px;
+  transition: transform 0.3s;
+  line-height: 1;
+}
+
+.question-card.open .chevron { transform: rotate(180deg); }
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  padding: 4px;
+  line-height: 1;
+}
+.star-btn.active { color: #fbbf24; }
+
+/* ANSWER */
+.answer-body {
+  display: none;
+  padding: 0 20px 24px;
+  border-top: 1px solid var(--border);
+}
+.question-card.open .answer-body { display: block; }
+
+.answer-body h3 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.answer-body p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.answer-body ul, .answer-body ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.answer-body li {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #cbd5e1;
+}
+
+.tip-box {
+  background: rgba(0, 212, 255, 0.07);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 14px 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #94d8e8;
+}
+
+.warn-box {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid var(--warn);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 14px 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #fcd34d;
+}
+
+.formula {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: #a78bfa;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.diagram-wrap {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.diagram-wrap svg {
+  display: block;
+  max-width: 100%;
+}
+
+.diagram-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="logo">МПТ</div>
+      <div class="subtitle">// Микропроцессорная техника — полный конспект</div>
+    </div>
+    <div class="stats" style="margin-left:auto">
+      <span class="stat-badge" id="count-badge">43 вопроса</span>
+      <span class="stat-badge" id="fav-badge">★ 0</span>
+    </div>
+  </div>
+  <div class="controls">
+    <input id="search" placeholder="🔍  Поиск по вопросам и ответам...">
+    <select id="filter">
+      <option value="all">Все темы</option>
+      <option value="interface">Интерфейсы</option>
+      <option value="mcu">Микроконтроллеры</option>
+      <option value="control">САУ</option>
+      <option value="sensors">Датчики и моторы</option>
+    </select>
+  </div>
+</header>
+
+<div class="container" id="list"></div>
+
+<script>
+let fav = new Set();
+
+// ========== SVG СХЕМЫ ==========
+
+const SVG = {
+
+resistor: `<svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <line x1="10" y1="50" x2="80" y2="50" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="80" y="35" width="80" height="30" fill="none" stroke="#fbbf24" stroke-width="2.5" rx="3"/>
+  <line x1="160" y1="50" x2="240" y2="50" stroke="#00d4ff" stroke-width="2"/>
+  <text x="20" y="75" fill="#64748b" font-size="11" font-family="monospace">A</text>
+  <text x="225" y="75" fill="#64748b" font-size="11" font-family="monospace">B</text>
+  <text x="105" y="55" fill="#fbbf24" font-size="13" font-family="monospace">R</text>
+  <text x="10" y="25" fill="#94a3b8" font-size="11">Ток →</text>
+  <text x="270" y="55" fill="#94a3b8" font-size="12">Так выглядит</text>
+  <text x="270" y="70" fill="#94a3b8" font-size="12">резистор на схеме</text>
+</svg>`,
+
+resistorTypes: `<svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Обычный резистор -->
+  <line x1="20" y1="40" x2="60" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="60" y="28" width="50" height="24" fill="none" stroke="#fbbf24" stroke-width="2" rx="2"/>
+  <line x1="110" y1="40" x2="150" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <text x="60" y="65" fill="#fbbf24" font-size="11" font-family="monospace">Обычный R</text>
+  <!-- Переменный -->
+  <line x1="200" y1="40" x2="240" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="240" y="28" width="50" height="24" fill="none" stroke="#10b981" stroke-width="2" rx="2"/>
+  <line x1="290" y1="40" x2="330" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <line x1="265" y1="28" x2="275" y2="10" stroke="#10b981" stroke-width="2"/>
+  <polygon points="265,28 285,28 275,10" fill="#10b981" opacity="0.5"/>
+  <text x="230" y="65" fill="#10b981" font-size="11" font-family="monospace">Переменный</text>
+  <!-- Терморезистор -->
+  <line x1="380" y1="40" x2="420" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="420" y="28" width="50" height="24" fill="none" stroke="#f59e0b" stroke-width="2" rx="2"/>
+  <line x1="470" y1="40" x2="510" y2="40" stroke="#00d4ff" stroke-width="2"/>
+  <text x="428" y="38" fill="#f59e0b" font-size="11">NTC</text>
+  <text x="408" y="65" fill="#f59e0b" font-size="11" font-family="monospace">Терморезистор</text>
+  <!-- Пояснения -->
+  <line x1="20" y1="110" x2="560" y2="110" stroke="#2a3a55" stroke-width="1"/>
+  <text x="20" y="135" fill="#94a3b8" font-size="11">• Прямоугольник = резистор</text>
+  <text x="20" y="150" fill="#94a3b8" font-size="11">• Стрелка = можно менять значение</text>
+  <text x="300" y="135" fill="#94a3b8" font-size="11">• NTC/PTC = меняется от температуры</text>
+</svg>`,
+
+pullup: `<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- VCC -->
+  <text x="130" y="20" fill="#10b981" font-size="13" font-family="monospace" text-anchor="middle">VCC (+5В)</text>
+  <line x1="130" y1="25" x2="130" y2="50" stroke="#10b981" stroke-width="2"/>
+  <!-- Резистор pull-up -->
+  <rect x="105" y="50" width="50" height="24" fill="none" stroke="#fbbf24" stroke-width="2" rx="2"/>
+  <text x="116" y="67" fill="#fbbf24" font-size="12" font-family="monospace">10к</text>
+  <line x1="130" y1="74" x2="130" y2="110" stroke="#00d4ff" stroke-width="2"/>
+  <!-- Узел -->
+  <circle cx="130" cy="110" r="4" fill="#00d4ff"/>
+  <!-- К МК -->
+  <line x1="130" y1="110" x2="230" y2="110" stroke="#00d4ff" stroke-width="2"/>
+  <text x="235" y="115" fill="#a78bfa" font-size="12" font-family="monospace">→ МК</text>
+  <!-- Кнопка -->
+  <line x1="130" y1="110" x2="130" y2="145" stroke="#00d4ff" stroke-width="2"/>
+  <line x1="105" y1="145" x2="155" y2="145" stroke="#ef4444" stroke-width="2.5"/>
+  <line x1="105" y1="165" x2="155" y2="165" stroke="#ef4444" stroke-width="2.5"/>
+  <text x="165" y="158" fill="#ef4444" font-size="11">Кнопка</text>
+  <line x1="130" y1="165" x2="130" y2="195" stroke="#00d4ff" stroke-width="2"/>
+  <!-- GND -->
+  <line x1="105" y1="195" x2="155" y2="195" stroke="#94a3b8" stroke-width="2.5"/>
+  <line x1="112" y1="201" x2="148" y2="201" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="119" y1="207" x2="141" y2="207" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="160" y="200" fill="#94a3b8" font-size="12" font-family="monospace">GND</text>
+  <!-- Пояснение -->
+  <text x="5" y="20" fill="#64748b" font-size="10">Без нажатия: HIGH</text>
+  <text x="5" y="33" fill="#64748b" font-size="10">С нажатием: LOW</text>
+</svg>`,
+
+sauBlock: `<svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/></marker></defs>
+  <!-- Задание r -->
+  <text x="10" y="55" fill="#fbbf24" font-size="13" font-family="monospace">r(t)</text>
+  <line x1="45" y1="50" x2="90" y2="50" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- Сравниватель -->
+  <circle cx="110" cy="50" r="18" fill="none" stroke="#10b981" stroke-width="2"/>
+  <text x="104" y="55" fill="#10b981" font-size="16">Σ</text>
+  <line x1="128" y1="50" x2="185" y2="50" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="140" y="43" fill="#00d4ff" font-size="11">e(t)</text>
+  <!-- Регулятор (МК) -->
+  <rect x="185" y="30" width="110" height="40" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="225" y="55" fill="#a78bfa" font-size="13" font-family="monospace" text-anchor="middle">МК</text>
+  <line x1="295" y1="50" x2="350" y2="50" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- Объект -->
+  <rect x="350" y="30" width="110" height="40" rx="8" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="405" y="55" fill="#34d399" font-size="12" font-family="monospace" text-anchor="middle">Объект</text>
+  <line x1="460" y1="50" x2="530" y2="50" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="540" y="55" fill="#fbbf24" font-size="13" font-family="monospace">y(t)</text>
+  <!-- Обратная связь -->
+  <line x1="510" y1="50" x2="510" y2="105" stroke="#ef4444" stroke-width="2"/>
+  <line x1="510" y1="105" x2="110" y2="105" stroke="#ef4444" stroke-width="2"/>
+  <line x1="110" y1="105" x2="110" y2="68" stroke="#ef4444" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="280" y="120" fill="#ef4444" font-size="11" font-family="monospace">Обратная связь</text>
+  <!-- Датчик -->
+  <rect x="400" y="90" width="80" height="25" rx="5" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="440" y="107" fill="#ef4444" font-size="11" font-family="monospace" text-anchor="middle">Датчик</text>
+  <text x="200" y="15" fill="#64748b" font-size="11">Задание → [Ошибка] → МК считает → Объект управляется → Датчик следит</text>
+</svg>`,
+
+spiDiagram: `<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/></marker>
+  <marker id="a3" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><polygon points="8 0, 0 3, 8 6" fill="#10b981"/></marker></defs>
+  <!-- Master -->
+  <rect x="20" y="30" width="140" height="160" rx="10" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="90" y="55" fill="#a78bfa" font-size="13" font-family="monospace" text-anchor="middle">MASTER</text>
+  <text x="90" y="72" fill="#a78bfa" font-size="11" text-anchor="middle">(МК)</text>
+  <text x="30" y="100" fill="#64748b" font-size="11">MOSI →</text>
+  <text x="30" y="120" fill="#64748b" font-size="11">← MISO</text>
+  <text x="30" y="140" fill="#64748b" font-size="11">SCK →</text>
+  <text x="30" y="160" fill="#64748b" font-size="11">SS →</text>
+  <!-- Slave -->
+  <rect x="440" y="30" width="140" height="160" rx="10" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="510" y="55" fill="#34d399" font-size="13" font-family="monospace" text-anchor="middle">SLAVE</text>
+  <text x="510" y="72" fill="#34d399" font-size="11" text-anchor="middle">(Устройство)</text>
+  <text x="450" y="100" fill="#64748b" font-size="11">→ MOSI</text>
+  <text x="450" y="120" fill="#64748b" font-size="11">MISO ←</text>
+  <text x="450" y="140" fill="#64748b" font-size="11">→ SCK</text>
+  <text x="450" y="160" fill="#64748b" font-size="11">→ SS</text>
+  <!-- Линии -->
+  <line x1="160" y1="96" x2="440" y2="96" stroke="#00d4ff" stroke-width="2" marker-end="url(#a2)"/>
+  <text x="280" y="90" fill="#00d4ff" font-size="11" text-anchor="middle">MOSI (данные)</text>
+  <line x1="440" y1="116" x2="160" y2="116" stroke="#10b981" stroke-width="2" marker-end="url(#a3)"/>
+  <text x="280" y="132" fill="#10b981" font-size="11" text-anchor="middle">MISO (ответ)</text>
+  <line x1="160" y1="136" x2="440" y2="136" stroke="#fbbf24" stroke-width="2" marker-end="url(#a2)"/>
+  <text x="280" y="152" fill="#fbbf24" font-size="11" text-anchor="middle">SCK (такт)</text>
+  <line x1="160" y1="156" x2="440" y2="156" stroke="#ef4444" stroke-width="2" marker-end="url(#a2)"/>
+  <text x="280" y="172" fill="#ef4444" font-size="11" text-anchor="middle">SS (выбор)</text>
+  <!-- Таймлайн -->
+  <text x="10" y="208" fill="#64748b" font-size="11">SPI — 4 провода, быстрый, полный дуплекс (одновременная отправка и приём)</text>
+</svg>`,
+
+i2cDiagram: `<svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/></marker></defs>
+  <!-- Шина -->
+  <line x1="20" y1="60" x2="580" y2="60" stroke="#00d4ff" stroke-width="2.5"/>
+  <line x1="20" y1="90" x2="580" y2="90" stroke="#fbbf24" stroke-width="2.5"/>
+  <text x="5" y="55" fill="#00d4ff" font-size="11" font-family="monospace">SDA</text>
+  <text x="5" y="85" fill="#fbbf24" font-size="11" font-family="monospace">SCL</text>
+  <!-- VCC + резисторы подтяжки -->
+  <line x1="100" y1="10" x2="100" y2="60" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3"/>
+  <rect x="85" y="10" width="30" height="18" fill="none" stroke="#10b981" stroke-width="1.5" rx="2"/>
+  <text x="90" y="23" fill="#10b981" font-size="9">4k7</text>
+  <text x="75" y="8" fill="#10b981" font-size="10">VCC</text>
+  <line x1="200" y1="10" x2="200" y2="90" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3"/>
+  <rect x="185" y="10" width="30" height="18" fill="none" stroke="#10b981" stroke-width="1.5" rx="2"/>
+  <text x="190" y="23" fill="#10b981" font-size="9">4k7</text>
+  <text x="175" y="8" fill="#10b981" font-size="10">VCC</text>
+  <!-- Устройства -->
+  <rect x="280" y="40" width="80" height="60" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="320" y="68" fill="#a78bfa" font-size="11" text-anchor="middle">Master</text>
+  <text x="320" y="82" fill="#a78bfa" font-size="10" text-anchor="middle">МК</text>
+  <line x1="320" y1="40" x2="320" y2="10" stroke="#a78bfa" stroke-width="1.5"/>
+  <circle cx="320" cy="60" r="4" fill="#7c3aed"/>
+  <circle cx="320" cy="90" r="4" fill="#7c3aed"/>
+  <!-- Slave 1 -->
+  <rect x="390" y="40" width="70" height="60" rx="8" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="425" y="68" fill="#34d399" font-size="11" text-anchor="middle">Slave 1</text>
+  <text x="425" y="82" fill="#34d399" font-size="9" text-anchor="middle">addr: 0x48</text>
+  <circle cx="425" cy="60" r="4" fill="#10b981"/>
+  <circle cx="425" cy="90" r="4" fill="#10b981"/>
+  <!-- Slave 2 -->
+  <rect x="480" y="40" width="70" height="60" rx="8" fill="#1a2235" stroke="#f59e0b" stroke-width="2"/>
+  <text x="515" y="68" fill="#fbbf24" font-size="11" text-anchor="middle">Slave 2</text>
+  <text x="515" y="82" fill="#fbbf24" font-size="9" text-anchor="middle">addr: 0x52</text>
+  <circle cx="515" cy="60" r="4" fill="#f59e0b"/>
+  <circle cx="515" cy="90" r="4" fill="#f59e0b"/>
+  <!-- Пояснение -->
+  <text x="20" y="165" fill="#64748b" font-size="11">Все устройства на одной шине (2 провода). Каждое имеет уникальный адрес. Резисторы подтяжки обязательны!</text>
+</svg>`,
+
+uartDiagram: `<svg viewBox="0 0 560 160" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/></marker></defs>
+  <!-- Device A -->
+  <rect x="20" y="30" width="120" height="80" rx="10" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="80" y="65" fill="#a78bfa" font-size="13" text-anchor="middle">МК</text>
+  <text x="80" y="82" fill="#64748b" font-size="10" text-anchor="middle">TX | RX</text>
+  <!-- Device B -->
+  <rect x="420" y="30" width="120" height="80" rx="10" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="480" y="65" fill="#34d399" font-size="13" text-anchor="middle">ПК/МК</text>
+  <text x="480" y="82" fill="#64748b" font-size="10" text-anchor="middle">RX | TX</text>
+  <!-- Линии TX->RX -->
+  <line x1="140" y1="60" x2="420" y2="60" stroke="#00d4ff" stroke-width="2" marker-end="url(#a5)"/>
+  <text x="280" y="52" fill="#00d4ff" font-size="11" text-anchor="middle">TX → RX</text>
+  <line x1="420" y1="80" x2="140" y2="80" stroke="#10b981" stroke-width="2"/>
+  <polygon points="140,77 140,83 132,80" fill="#10b981"/>
+  <text x="280" y="96" fill="#10b981" font-size="11" text-anchor="middle">RX ← TX</text>
+  <!-- GND -->
+  <line x1="140" y1="100" x2="420" y2="100" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="280" y="115" fill="#94a3b8" font-size="11" text-anchor="middle">GND (общий)</text>
+  <!-- Фрейм -->
+  <text x="20" y="145" fill="#64748b" font-size="11">Фрейм: [СТАРТ 0] [D0 D1 D2 D3 D4 D5 D6 D7] [СТОП 1]  — скорость одинаковая с двух сторон!</text>
+</svg>`,
+
+canDiagram: `<svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+  <line x1="20" y1="70" x2="580" y2="70" stroke="#00d4ff" stroke-width="3"/>
+  <line x1="20" y1="90" x2="580" y2="90" stroke="#fbbf24" stroke-width="3"/>
+  <text x="5" y="65" fill="#00d4ff" font-size="11">CAN H</text>
+  <text x="5" y="95" fill="#fbbf24" font-size="11">CAN L</text>
+  <!-- Терминаторы -->
+  <rect x="20" y="65" width="10" height="30" fill="#ef4444" rx="2"/>
+  <text x="8" y="115" fill="#ef4444" font-size="9">120Ω</text>
+  <rect x="570" y="65" width="10" height="30" fill="#ef4444" rx="2"/>
+  <text x="558" y="115" fill="#ef4444" font-size="9">120Ω</text>
+  <!-- Узлы -->
+  <line x1="150" y1="70" x2="150" y2="30" stroke="#a78bfa" stroke-width="1.5"/>
+  <line x1="150" y1="90" x2="150" y2="130" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="120" y="18" width="60" height="22" rx="5" fill="#1a2235" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="150" y="33" fill="#a78bfa" font-size="10" text-anchor="middle">ЭБУ двигат.</text>
+  <line x1="300" y1="70" x2="300" y2="30" stroke="#a78bfa" stroke-width="1.5"/>
+  <line x1="300" y1="90" x2="300" y2="130" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="270" y="18" width="60" height="22" rx="5" fill="#1a2235" stroke="#10b981" stroke-width="1.5"/>
+  <text x="300" y="33" fill="#34d399" font-size="10" text-anchor="middle">Тормоза ABS</text>
+  <line x1="450" y1="70" x2="450" y2="30" stroke="#a78bfa" stroke-width="1.5"/>
+  <line x1="450" y1="90" x2="450" y2="130" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="420" y="18" width="60" height="22" rx="5" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="450" y="33" fill="#fbbf24" font-size="10" text-anchor="middle">Подушки</text>
+  <text x="150" y="148" fill="#64748b" font-size="10" text-anchor="middle">Стуб</text>
+  <text x="300" y="148" fill="#64748b" font-size="10" text-anchor="middle">Стуб</text>
+  <text x="450" y="148" fill="#64748b" font-size="10" text-anchor="middle">Стуб</text>
+  <text x="300" y="158" fill="#94a3b8" font-size="11" text-anchor="middle">Все устройства на одной паре проводов (витая пара)</text>
+</svg>`,
+
+avr: `<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- Корпус МК -->
+  <rect x="150" y="50" width="200" height="170" rx="10" fill="#1a2235" stroke="#7c3aed" stroke-width="2.5"/>
+  <text x="250" y="90" fill="#a78bfa" font-size="14" font-family="monospace" text-anchor="middle">ATmega328P</text>
+  <!-- Внутри -->
+  <rect x="165" y="100" width="55" height="30" rx="4" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="192" y="119" fill="#00d4ff" font-size="10" text-anchor="middle">CPU</text>
+  <rect x="230" y="100" width="50" height="30" rx="4" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+  <text x="255" y="119" fill="#34d399" font-size="10" text-anchor="middle">Flash</text>
+  <rect x="290" y="100" width="50" height="30" rx="4" fill="#111827" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="315" y="119" fill="#fbbf24" font-size="10" text-anchor="middle">SRAM</text>
+  <rect x="165" y="145" width="55" height="30" rx="4" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="192" y="163" fill="#f59e0b" font-size="10" text-anchor="middle">Timer</text>
+  <rect x="230" y="145" width="50" height="30" rx="4" fill="#111827" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="255" y="163" fill="#ef4444" font-size="10" text-anchor="middle">ADC</text>
+  <rect x="290" y="145" width="50" height="30" rx="4" fill="#111827" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="315" y="163" fill="#a78bfa" font-size="10" text-anchor="middle">SPI/I2C</text>
+  <rect x="165" y="190" width="175" height="20" rx="3" fill="#111827" stroke="#64748b" stroke-width="1"/>
+  <text x="252" y="204" fill="#94a3b8" font-size="10" text-anchor="middle">GPIO порты A/B/C/D</text>
+  <!-- Пины слева -->
+  <line x1="100" y1="80" x2="150" y2="80" stroke="#64748b" stroke-width="1.5"/>
+  <text x="90" y="84" fill="#64748b" font-size="9" text-anchor="end">VCC</text>
+  <line x1="100" y1="100" x2="150" y2="100" stroke="#64748b" stroke-width="1.5"/>
+  <text x="90" y="104" fill="#64748b" font-size="9" text-anchor="end">GND</text>
+  <line x1="100" y1="120" x2="150" y2="120" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="90" y="124" fill="#00d4ff" font-size="9" text-anchor="end">RESET</text>
+  <line x1="100" y1="140" x2="150" y2="140" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="90" y="144" fill="#fbbf24" font-size="9" text-anchor="end">XTAL1</text>
+  <line x1="100" y1="160" x2="150" y2="160" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="90" y="164" fill="#fbbf24" font-size="9" text-anchor="end">XTAL2</text>
+  <!-- Пины справа -->
+  <line x1="350" y1="80" x2="400" y2="80" stroke="#10b981" stroke-width="1.5"/>
+  <text x="408" y="84" fill="#10b981" font-size="9">PB0..PB7</text>
+  <line x1="350" y1="110" x2="400" y2="110" stroke="#10b981" stroke-width="1.5"/>
+  <text x="408" y="114" fill="#10b981" font-size="9">PC0..PC5</text>
+  <line x1="350" y1="140" x2="400" y2="140" stroke="#10b981" stroke-width="1.5"/>
+  <text x="408" y="144" fill="#10b981" font-size="9">PD0..PD7</text>
+  <line x1="350" y1="170" x2="400" y2="170" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="408" y="174" fill="#ef4444" font-size="9">ADC0..ADC5</text>
+</svg>`,
+
+timerDiagram: `<svg viewBox="0 0 550 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Счётчик -->
+  <text x="10" y="30" fill="#94a3b8" font-size="12">TCNT0: 0 → 255 → переполнение → 0 → 255 ...</text>
+  <!-- Пилообразный сигнал -->
+  <polyline points="30,140 100,60 100,140 170,60 170,140 240,60 240,140 310,60 310,140" fill="none" stroke="#00d4ff" stroke-width="2"/>
+  <text x="30" y="155" fill="#64748b" font-size="11">0</text>
+  <text x="90" y="55" fill="#64748b" font-size="11">255</text>
+  <text x="100" y="155" fill="#64748b" font-size="11">↑ overflow</text>
+  <!-- OCR линия -->
+  <line x1="30" y1="90" x2="310" y2="90" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="5"/>
+  <text x="315" y="94" fill="#fbbf24" font-size="11">OCR = 128</text>
+  <!-- PWM вывод -->
+  <text x="30" y="30" fill="#10b981" font-size="11" dy="120">PWM выход:</text>
+  <polyline points="30,145 30,135 100,135 100,145 170,145 170,135 240,135 240,145 310,145" fill="none" stroke="#10b981" stroke-width="2" transform="translate(320,-80)"/>
+  <text x="320" y="75" fill="#10b981" font-size="11">HIGH</text>
+  <text x="320" y="105" fill="#10b981" font-size="11">LOW</text>
+  <text x="10" y="155" fill="#64748b" font-size="11">Когда счётчик &lt; OCR → HIGH; когда &gt; OCR → LOW. Меняя OCR — меняем скважность!</text>
+</svg>`,
+
+interruptDiagram: `<svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a6" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#ef4444"/></marker></defs>
+  <!-- Основная программа -->
+  <text x="10" y="20" fill="#94a3b8" font-size="12">Основная программа (Main Loop)</text>
+  <rect x="10" y="25" width="460" height="30" rx="5" fill="#1a2235" stroke="#64748b" stroke-width="1"/>
+  <text x="30" y="44" fill="#64748b" font-size="11">...инструкция А... инструкция Б... ↯ ПРЕРЫВАНИЕ! ...продолжение...</text>
+  <!-- Стрелка вниз -->
+  <line x1="220" y1="55" x2="220" y2="80" stroke="#ef4444" stroke-width="2" marker-end="url(#a6)"/>
+  <!-- ISR -->
+  <rect x="140" y="80" width="160" height="40" rx="8" fill="#1a2235" stroke="#ef4444" stroke-width="2"/>
+  <text x="220" y="97" fill="#ef4444" font-size="12" text-anchor="middle">ISR — обработчик</text>
+  <text x="220" y="112" fill="#ef4444" font-size="10" text-anchor="middle">прерывания</text>
+  <!-- Возврат -->
+  <line x1="300" y1="100" x2="350" y2="100" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="350" y1="100" x2="350" y2="40" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="350" y1="40" x2="300" y2="40" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#a6)"/>
+  <text x="360" y="75" fill="#10b981" font-size="10">RETI</text>
+  <text x="10" y="140" fill="#64748b" font-size="11">Событие (кнопка, таймер, UART) → CPU прерывает задачу → выполняет ISR → возвращается</text>
+</svg>`,
+
+wheatstone: `<svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a7" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#00d4ff"/></marker></defs>
+  <!-- Ромб Уитстона -->
+  <!-- Верх -->
+  <line x1="150" y1="20" x2="80" y2="100" stroke="#00d4ff" stroke-width="2"/>
+  <line x1="150" y1="20" x2="220" y2="100" stroke="#00d4ff" stroke-width="2"/>
+  <!-- Низ -->
+  <line x1="80" y1="160" x2="150" y2="240" stroke="#00d4ff" stroke-width="2"/>
+  <line x1="220" y1="160" x2="150" y2="240" stroke="#00d4ff" stroke-width="2"/>
+  <!-- Резисторы на линиях -->
+  <rect x="52" y="95" width="36" height="20" rx="3" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="70" y="109" fill="#fbbf24" font-size="10" text-anchor="middle">R1</text>
+  <rect x="212" y="95" width="36" height="20" rx="3" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="230" y="109" fill="#fbbf24" font-size="10" text-anchor="middle">R2</text>
+  <rect x="52" y="145" width="36" height="20" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <text x="70" y="159" fill="#f59e0b" font-size="10" text-anchor="middle">Rx</text>
+  <rect x="212" y="145" width="36" height="20" rx="3" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="230" y="159" fill="#fbbf24" font-size="10" text-anchor="middle">R3</text>
+  <!-- Вольтметр -->
+  <line x1="80" y1="130" x2="220" y2="130" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4"/>
+  <circle cx="150" cy="130" r="14" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="150" y="134" fill="#10b981" font-size="10" text-anchor="middle">V</text>
+  <!-- Питание -->
+  <text x="150" y="14" fill="#10b981" font-size="11" text-anchor="middle">Uпит</text>
+  <text x="150" y="252" fill="#94a3b8" font-size="11" text-anchor="middle">GND</text>
+  <text x="10" y="20" fill="#64748b" font-size="10">Rx — датчик</text>
+  <text x="10" y="33" fill="#64748b" font-size="10">(терморезистор)</text>
+</svg>`,
+
+lcd: `<svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- LCD корпус -->
+  <rect x="80" y="20" width="340" height="100" rx="8" fill="#1a3a1a" stroke="#10b981" stroke-width="2.5"/>
+  <!-- Экран -->
+  <rect x="95" y="30" width="310" height="80" rx="4" fill="#0d2a0d"/>
+  <!-- Символы на экране -->
+  <text x="105" y="65" fill="#00ff88" font-size="15" font-family="monospace">Hello, World!</text>
+  <text x="105" y="92" fill="#00ff88" font-size="15" font-family="monospace">Temp: 23.5 C</text>
+  <!-- Пины снизу -->
+  <text x="80" y="145" fill="#64748b" font-size="11">Пины LCD 16x2 (HD44780):</text>
+  <text x="80" y="160" fill="#fbbf24" font-size="11" font-family="monospace">VSS GND │ VDD 5В │ V0 контраст │ RS │ RW │ EN │ D4-D7 │ LED+ LED-</text>
+  <!-- Подключение -->
+  <text x="80" y="182" fill="#94a3b8" font-size="11">RS→D4 │ EN→D5 │ D4→D6 │ D5→D7 │ D6→D8 │ D7→D9 (4-битный режим)</text>
+</svg>`,
+
+sevenSeg: `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Сегмент A (верх) -->
+  <rect x="90" y="20" width="60" height="12" rx="4" fill="#ef4444" id="segA"/>
+  <!-- Сегмент B (правый верх) -->
+  <rect x="152" y="22" width="12" height="60" rx="4" fill="#ef4444"/>
+  <!-- Сегмент C (правый низ) -->
+  <rect x="152" y="102" width="12" height="60" rx="4" fill="#ef4444"/>
+  <!-- Сегмент D (низ) -->
+  <rect x="90" y="164" width="60" height="12" rx="4" fill="#ef4444"/>
+  <!-- Сегмент E (левый низ) -->
+  <rect x="76" y="102" width="12" height="60" rx="4" fill="#2a3a55"/>
+  <!-- Сегмент F (левый верх) -->
+  <rect x="76" y="22" width="12" height="60" rx="4" fill="#2a3a55"/>
+  <!-- Сегмент G (середина) -->
+  <rect x="90" y="92" width="60" height="12" rx="4" fill="#ef4444"/>
+  <!-- Точка -->
+  <circle cx="178" cy="174" r="7" fill="#2a3a55"/>
+  <!-- Буквы сегментов -->
+  <text x="115" y="19" fill="#64748b" font-size="10" text-anchor="middle">a</text>
+  <text x="170" y="55" fill="#64748b" font-size="10">b</text>
+  <text x="170" y="135" fill="#64748b" font-size="10">c</text>
+  <text x="115" y="188" fill="#64748b" font-size="10" text-anchor="middle">d</text>
+  <text x="60" y="135" fill="#64748b" font-size="10">e</text>
+  <text x="60" y="55" fill="#64748b" font-size="10">f</text>
+  <text x="115" y="103" fill="#64748b" font-size="10" text-anchor="middle">g</text>
+  <!-- Цифра "3" горит -->
+  <text x="30" y="50" fill="#94a3b8" font-size="11">Горит</text>
+  <text x="30" y="63" fill="#94a3b8" font-size="11">цифра 3:</text>
+  <text x="30" y="78" fill="#ef4444" font-size="11">a,b,c,d,g</text>
+</svg>`,
+
+servo: `<svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Корпус сервы -->
+  <rect x="150" y="60" width="100" height="80" rx="8" fill="#1a2235" stroke="#a78bfa" stroke-width="2"/>
+  <text x="200" y="105" fill="#a78bfa" font-size="12" text-anchor="middle">Сервопривод</text>
+  <!-- Вал -->
+  <circle cx="200" cy="60" r="15" fill="#2a3a55" stroke="#a78bfa" stroke-width="2"/>
+  <line x1="200" y1="45" x2="200" y2="20" stroke="#fbbf24" stroke-width="3"/>
+  <text x="210" y="18" fill="#fbbf24" font-size="11">Вал</text>
+  <!-- Провода -->
+  <line x1="155" y1="140" x2="80" y2="140" stroke="#ef4444" stroke-width="3"/>
+  <text x="70" y="138" fill="#ef4444" font-size="11" text-anchor="end">VCC</text>
+  <line x1="165" y1="140" x2="80" y2="155" stroke="#94a3b8" stroke-width="3"/>
+  <text x="70" y="158" fill="#94a3b8" font-size="11" text-anchor="end">GND</text>
+  <line x1="175" y1="140" x2="80" y2="170" stroke="#fbbf24" stroke-width="3"/>
+  <text x="70" y="173" fill="#fbbf24" font-size="11" text-anchor="end">PWM</text>
+  <!-- PWM диаграмма -->
+  <text x="270" y="40" fill="#94a3b8" font-size="11">PWM: 50 Гц</text>
+  <text x="270" y="55" fill="#94a3b8" font-size="11">1мс = 0°</text>
+  <text x="270" y="70" fill="#94a3b8" font-size="11">1.5мс = 90°</text>
+  <text x="270" y="85" fill="#94a3b8" font-size="11">2мс = 180°</text>
+</svg>`,
+
+encoder: `<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Диск -->
+  <circle cx="120" cy="80" r="60" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <circle cx="120" cy="80" r="15" fill="#2a3a55" stroke="#64748b" stroke-width="2"/>
+  <!-- Прорези на диске -->
+  <path d="M120,20 A60,60 0 0,1 180,80" fill="none" stroke="#fbbf24" stroke-width="8"/>
+  <path d="M120,80 L120,20" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3"/>
+  <!-- Сенсор -->
+  <rect x="178" y="65" width="20" height="30" rx="4" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="188" y="84" fill="#10b981" font-size="10" text-anchor="middle">IR</text>
+  <!-- Каналы A и B -->
+  <text x="220" y="30" fill="#94a3b8" font-size="11">Канал A:</text>
+  <polyline points="220,40 240,40 240,55 260,55 260,40 280,40 280,55 300,55 300,40 320,40" fill="none" stroke="#00d4ff" stroke-width="2"/>
+  <text x="220" y="80" fill="#94a3b8" font-size="11">Канал B:</text>
+  <polyline points="220,90 230,90 230,105 250,105 250,90 270,90 270,105 290,105 290,90 310,90" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <text x="220" y="130" fill="#64748b" font-size="11">Сдвиг фазы A/B → определяет направление вращения</text>
+</svg>`,
+
+stepperDiagram: `<svg viewBox="0 0 440 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Мотор -->
+  <circle cx="80" cy="80" r="55" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="80" y="75" fill="#34d399" font-size="12" text-anchor="middle">Шаговый</text>
+  <text x="80" y="92" fill="#34d399" font-size="12" text-anchor="middle">мотор</text>
+  <!-- Обмотки -->
+  <text x="30" y="30" fill="#fbbf24" font-size="10">A+</text>
+  <text x="110" y="30" fill="#fbbf24" font-size="10">A-</text>
+  <text x="30" y="140" fill="#00d4ff" font-size="10">B+</text>
+  <text x="110" y="140" fill="#00d4ff" font-size="10">B-</text>
+  <!-- Последовательность шагов -->
+  <text x="160" y="20" fill="#94a3b8" font-size="12">Последовательность (полный шаг):</text>
+  <text x="160" y="40" fill="#64748b" font-size="11" font-family="monospace">Шаг 1: A+ = 1, B+ = 0</text>
+  <text x="160" y="58" fill="#64748b" font-size="11" font-family="monospace">Шаг 2: A+ = 0, B+ = 1</text>
+  <text x="160" y="76" fill="#64748b" font-size="11" font-family="monospace">Шаг 3: A+ = 0, B+ = 0, A- = 1</text>
+  <text x="160" y="94" fill="#64748b" font-size="11" font-family="monospace">Шаг 4: A+ = 0, B- = 1</text>
+  <text x="160" y="120" fill="#fbbf24" font-size="11">Каждый шаг = фиксированный угол</text>
+  <text x="160" y="138" fill="#fbbf24" font-size="11">(обычно 1.8° = 200 шагов/оборот)</text>
+</svg>`,
+
+dcMotor: `<svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- H-мост -->
+  <rect x="150" y="30" width="200" height="120" rx="6" fill="#1a2235" stroke="#64748b" stroke-width="1.5"/>
+  <text x="250" y="20" fill="#94a3b8" font-size="12" text-anchor="middle">H-мост (L298N / L293D)</text>
+  <!-- Транзисторы Q1-Q4 -->
+  <rect x="160" y="40" width="35" height="25" rx="3" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="177" y="57" fill="#a78bfa" font-size="10" text-anchor="middle">Q1</text>
+  <rect x="305" y="40" width="35" height="25" rx="3" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="322" y="57" fill="#a78bfa" font-size="10" text-anchor="middle">Q2</text>
+  <rect x="160" y="110" width="35" height="25" rx="3" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="177" y="127" fill="#a78bfa" font-size="10" text-anchor="middle">Q3</text>
+  <rect x="305" y="110" width="35" height="25" rx="3" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="322" y="127" fill="#a78bfa" font-size="10" text-anchor="middle">Q4</text>
+  <!-- Мотор -->
+  <rect x="215" y="70" width="70" height="50" rx="6" fill="#111827" stroke="#10b981" stroke-width="2"/>
+  <text x="250" y="100" fill="#34d399" font-size="13" text-anchor="middle">M</text>
+  <!-- VCC и GND -->
+  <line x1="250" y1="30" x2="250" y2="10" stroke="#10b981" stroke-width="2"/>
+  <text x="255" y="10" fill="#10b981" font-size="11">VCC</text>
+  <line x1="250" y1="150" x2="250" y2="170" stroke="#94a3b8" stroke-width="2"/>
+  <text x="255" y="175" fill="#94a3b8" font-size="11">GND</text>
+  <!-- Пояснение -->
+  <text x="10" y="90" fill="#64748b" font-size="11">Q1+Q4 вкл →</text>
+  <text x="10" y="105" fill="#64748b" font-size="11">мотор ВПЕРЁД</text>
+  <text x="10" y="125" fill="#64748b" font-size="11">Q2+Q3 вкл →</text>
+  <text x="10" y="140" fill="#64748b" font-size="11">мотор НАЗАД</text>
+</svg>`,
+
+memoryMap: `<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- Flash -->
+  <rect x="50" y="20" width="120" height="80" rx="6" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="110" y="55" fill="#a78bfa" font-size="13" text-anchor="middle">Flash</text>
+  <text x="110" y="72" fill="#64748b" font-size="11" text-anchor="middle">32 КБ</text>
+  <text x="110" y="88" fill="#64748b" font-size="10" text-anchor="middle">Программа</text>
+  <!-- SRAM -->
+  <rect x="200" y="20" width="120" height="80" rx="6" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="260" y="55" fill="#34d399" font-size="13" text-anchor="middle">SRAM</text>
+  <text x="260" y="72" fill="#64748b" font-size="11" text-anchor="middle">2 КБ</text>
+  <text x="260" y="88" fill="#64748b" font-size="10" text-anchor="middle">Данные (RAM)</text>
+  <!-- EEPROM -->
+  <rect x="125" y="130" width="120" height="80" rx="6" fill="#1a2235" stroke="#f59e0b" stroke-width="2"/>
+  <text x="185" y="165" fill="#fbbf24" font-size="13" text-anchor="middle">EEPROM</text>
+  <text x="185" y="182" fill="#64748b" font-size="11" text-anchor="middle">1 КБ</text>
+  <text x="185" y="198" fill="#64748b" font-size="10" text-anchor="middle">Без питания хранит</text>
+  <!-- Иконки -->
+  <text x="55" y="105" fill="#7c3aed" font-size="10">Только чтение</text>
+  <text x="205" y="105" fill="#10b981" font-size="10">Читать+писать</text>
+  <text x="130" y="218" fill="#f59e0b" font-size="10">Медленно, но постоянно</text>
+</svg>`,
+
+adc: `<svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a8" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#00d4ff"/></marker></defs>
+  <!-- Аналог -->
+  <text x="10" y="30" fill="#94a3b8" font-size="12">Аналоговый сигнал</text>
+  <path d="M10,100 Q35,40 60,80 Q85,120 110,60 Q135,20 160,70" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+  <!-- Стрелка -->
+  <line x1="175" y1="75" x2="230" y2="75" stroke="#00d4ff" stroke-width="2" marker-end="url(#a8)"/>
+  <!-- АЦП -->
+  <rect x="235" y="50" width="80" height="50" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="275" y="72" fill="#a78bfa" font-size="12" text-anchor="middle">АЦП</text>
+  <text x="275" y="88" fill="#64748b" font-size="10" text-anchor="middle">10 бит</text>
+  <!-- Стрелка -->
+  <line x1="315" y1="75" x2="370" y2="75" stroke="#00d4ff" stroke-width="2" marker-end="url(#a8)"/>
+  <!-- Цифровой -->
+  <text x="375" y="60" fill="#10b981" font-size="12">Число:</text>
+  <text x="375" y="78" fill="#10b981" font-size="14" font-family="monospace">0..1023</text>
+  <!-- Формула -->
+  <text x="10" y="140" fill="#64748b" font-size="11">Значение = (Uвход / Uоп) × 1023. Uоп = 5В → 5В даёт 1023, 2.5В даёт ~511</text>
+</svg>`,
+
+archDiagram: `<svg viewBox="0 0 560 190" xmlns="http://www.w3.org/2000/svg">
+  <!-- Harvard -->
+  <text x="100" y="20" fill="#00d4ff" font-size="14" font-family="monospace" text-anchor="middle">Harvard</text>
+  <rect x="55" y="30" width="90" height="40" rx="6" fill="#1a2235" stroke="#00d4ff" stroke-width="2"/>
+  <text x="100" y="55" fill="#00d4ff" font-size="12" text-anchor="middle">CPU</text>
+  <rect x="10" y="100" width="80" height="35" rx="5" fill="#1a2235" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="50" y="122" fill="#a78bfa" font-size="11" text-anchor="middle">Flash (код)</text>
+  <rect x="110" y="100" width="80" height="35" rx="5" fill="#1a2235" stroke="#10b981" stroke-width="1.5"/>
+  <text x="150" y="122" fill="#34d399" font-size="11" text-anchor="middle">SRAM (данные)</text>
+  <line x1="80" y1="70" x2="50" y2="100" stroke="#7c3aed" stroke-width="1.5"/>
+  <line x1="120" y1="70" x2="150" y2="100" stroke="#10b981" stroke-width="1.5"/>
+  <text x="50" y="155" fill="#fbbf24" font-size="11" text-anchor="middle">2 шины = быстро!</text>
+  <!-- Von Neumann -->
+  <text x="420" y="20" fill="#f59e0b" font-size="14" font-family="monospace" text-anchor="middle">Von Neumann</text>
+  <rect x="375" y="30" width="90" height="40" rx="6" fill="#1a2235" stroke="#f59e0b" stroke-width="2"/>
+  <text x="420" y="55" fill="#fbbf24" font-size="12" text-anchor="middle">CPU</text>
+  <rect x="365" y="100" width="110" height="35" rx="5" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="420" y="122" fill="#fbbf24" font-size="11" text-anchor="middle">Общая память</text>
+  <line x1="420" y1="70" x2="420" y2="100" stroke="#f59e0b" stroke-width="2"/>
+  <text x="420" y="155" fill="#94a3b8" font-size="11" text-anchor="middle">1 шина = проще</text>
+  <!-- Разделитель -->
+  <line x1="275" y1="10" x2="275" y2="175" stroke="#2a3a55" stroke-width="1.5" stroke-dasharray="5"/>
+  <text x="275" y="185" fill="#64748b" font-size="11" text-anchor="middle">AVR = Harvard (раздельные шины)</text>
+</svg>`,
+
+gpio: `<svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- МК -->
+  <rect x="180" y="30" width="140" height="120" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="250" y="60" fill="#a78bfa" font-size="13" text-anchor="middle">МК</text>
+  <!-- Пин как выход -->
+  <line x1="320" y1="70" x2="420" y2="70" stroke="#10b981" stroke-width="2"/>
+  <circle cx="420" cy="70" r="12" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="420" y="74" fill="#10b981" font-size="11" text-anchor="middle">LED</text>
+  <text x="330" y="63" fill="#64748b" font-size="10">OUTPUT</text>
+  <!-- Резистор перед LED -->
+  <rect x="345" y="63" width="30" height="14" rx="3" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="360" y="73" fill="#fbbf24" font-size="8" text-anchor="middle">R</text>
+  <!-- Пин как вход -->
+  <line x1="320" y1="110" x2="420" y2="110" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="400" y="100" width="30" height="20" rx="4" fill="#1a2235" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="415" y="113" fill="#00d4ff" font-size="10" text-anchor="middle">BTN</text>
+  <text x="330" y="103" fill="#64748b" font-size="10">INPUT</text>
+  <!-- DDRB, PORTB, PINB -->
+  <text x="10" y="50" fill="#94a3b8" font-size="12">Регистры AVR:</text>
+  <text x="10" y="68" fill="#fbbf24" font-size="11" font-family="monospace">DDRB = 0b00000001</text>
+  <text x="10" y="84" fill="#64748b" font-size="11">(PB0 = выход)</text>
+  <text x="10" y="105" fill="#10b981" font-size="11" font-family="monospace">PORTB |= (1&lt;&lt;PB0)</text>
+  <text x="10" y="121" fill="#64748b" font-size="11">(PB0 = HIGH)</text>
+  <text x="10" y="142" fill="#00d4ff" font-size="11" font-family="monospace">PINB & (1&lt;&lt;PB1)</text>
+  <text x="10" y="158" fill="#64748b" font-size="11">(читаем PB1)</text>
+</svg>`,
+
+quartzCircuit: `<svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- МК -->
+  <rect x="200" y="40" width="100" height="100" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="250" y="85" fill="#a78bfa" font-size="12" text-anchor="middle">МК</text>
+  <text x="250" y="102" fill="#64748b" font-size="10" text-anchor="middle">XTAL1 XTAL2</text>
+  <!-- Кварц -->
+  <line x1="140" y1="75" x2="200" y2="75" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="140" y1="105" x2="200" y2="105" stroke="#fbbf24" stroke-width="2"/>
+  <rect x="105" y="65" width="35" height="50" rx="4" fill="#1a2235" stroke="#fbbf24" stroke-width="2"/>
+  <text x="122" y="94" fill="#fbbf24" font-size="11" text-anchor="middle">Q</text>
+  <text x="100" y="60" fill="#64748b" font-size="10">16МГц</text>
+  <!-- Конденсаторы -->
+  <line x1="65" y1="60" x2="65" y2="75" stroke="#00d4ff" stroke-width="1.5"/>
+  <line x1="50" y1="75" x2="80" y2="75" stroke="#00d4ff" stroke-width="2.5"/>
+  <line x1="50" y1="81" x2="80" y2="81" stroke="#00d4ff" stroke-width="2.5"/>
+  <line x1="65" y1="81" x2="65" y2="100" stroke="#00d4ff" stroke-width="1.5"/>
+  <line x1="65" y1="60" x2="105" y2="60" stroke="#00d4ff" stroke-width="1.5"/>
+  <line x1="65" y1="100" x2="105" y2="100" stroke="#00d4ff" stroke-width="1.5"/>
+  <line x1="55" y1="115" x2="75" y2="115" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="60" y1="121" x2="70" y2="121" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="85" y="115" fill="#00d4ff" font-size="10">22пФ</text>
+  <text x="85" y="30" fill="#94a3b8" font-size="11">Кварц с конденсаторами</text>
+  <text x="85" y="45" fill="#64748b" font-size="11">задаёт точную частоту МК</text>
+</svg>`,
+
+eepromDiagram: `<svg viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a9" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#f59e0b"/></marker></defs>
+  <!-- Ячейки памяти -->
+  <text x="10" y="25" fill="#94a3b8" font-size="12">EEPROM — ячейки памяти (каждая хранит 1 байт):</text>
+  <rect x="10" y="35" width="40" height="35" rx="3" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="30" y="57" fill="#fbbf24" font-size="12" text-anchor="middle">42</text>
+  <text x="30" y="33" fill="#64748b" font-size="9" text-anchor="middle">0x00</text>
+  <rect x="55" y="35" width="40" height="35" rx="3" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="75" y="57" fill="#fbbf24" font-size="12" text-anchor="middle">17</text>
+  <text x="75" y="33" fill="#64748b" font-size="9" text-anchor="middle">0x01</text>
+  <rect x="100" y="35" width="40" height="35" rx="3" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="120" y="57" fill="#fbbf24" font-size="12" text-anchor="middle">255</text>
+  <text x="120" y="33" fill="#64748b" font-size="9" text-anchor="middle">0x02</text>
+  <text x="155" y="57" fill="#64748b" font-size="16">...</text>
+  <!-- Пояснения -->
+  <text x="10" y="100" fill="#94a3b8" font-size="11">Запись: EEPROM.write(addr, value)   Чтение: EEPROM.read(addr)</text>
+  <text x="10" y="118" fill="#fbbf24" font-size="11">⚡ Ресурс ~100 000 циклов записи. Не пиши в цикле постоянно!</text>
+  <text x="10" y="135" fill="#10b981" font-size="11">✓ Данные сохраняются без питания (настройки, калибровка)</text>
+</svg>`,
+
+sregDiagram: `<svg viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Регистр 8 бит -->
+  <text x="10" y="25" fill="#94a3b8" font-size="12">SREG — регистр состояния (Status Register), 8 бит:</text>
+  <rect x="10" y="35" width="470" height="50" rx="6" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <!-- Биты -->
+  <line x1="68" y1="35" x2="68" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="127" y1="35" x2="127" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="186" y1="35" x2="186" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="245" y1="35" x2="245" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="304" y1="35" x2="304" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="363" y1="35" x2="363" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <line x1="422" y1="35" x2="422" y2="85" stroke="#2a3a55" stroke-width="1"/>
+  <!-- Буквы -->
+  <text x="39" y="67" fill="#ef4444" font-size="16" text-anchor="middle">I</text>
+  <text x="97" y="67" fill="#fbbf24" font-size="16" text-anchor="middle">T</text>
+  <text x="156" y="67" fill="#a78bfa" font-size="16" text-anchor="middle">H</text>
+  <text x="215" y="67" fill="#a78bfa" font-size="16" text-anchor="middle">S</text>
+  <text x="274" y="67" fill="#10b981" font-size="16" text-anchor="middle">V</text>
+  <text x="333" y="67" fill="#10b981" font-size="16" text-anchor="middle">N</text>
+  <text x="392" y="67" fill="#00d4ff" font-size="16" text-anchor="middle">Z</text>
+  <text x="451" y="67" fill="#00d4ff" font-size="16" text-anchor="middle">C</text>
+  <!-- Пояснения -->
+  <text x="10" y="105" fill="#ef4444" font-size="10">I=прерывания</text>
+  <text x="100" y="105" fill="#fbbf24" font-size="10">T=копирование</text>
+  <text x="200" y="105" fill="#a78bfa" font-size="10">H=полуперенос</text>
+  <text x="295" y="105" fill="#10b981" font-size="10">V=переполнение</text>
+  <text x="380" y="105" fill="#10b981" font-size="10">N=отрицат.</text>
+  <text x="10" y="125" fill="#00d4ff" font-size="10">Z=результат ноль (Zero)</text>
+  <text x="200" y="125" fill="#00d4ff" font-size="10">C=перенос (Carry)</text>
+</svg>`,
+
+riscCisc: `<svg viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg">
+  <!-- RISC -->
+  <rect x="10" y="20" width="230" height="160" rx="10" fill="#1a2235" stroke="#00d4ff" stroke-width="2"/>
+  <text x="125" y="45" fill="#00d4ff" font-size="14" font-family="monospace" text-anchor="middle">RISC</text>
+  <text x="20" y="70" fill="#64748b" font-size="11">Команды: простые</text>
+  <text x="20" y="88" fill="#64748b" font-size="11">Каждая = 1 такт</text>
+  <text x="20" y="106" fill="#10b981" font-size="11">+ Быстро</text>
+  <text x="20" y="122" fill="#10b981" font-size="11">+ Конвейер эффективен</text>
+  <text x="20" y="138" fill="#ef4444" font-size="11">- Больше команд в программе</text>
+  <text x="20" y="158" fill="#fbbf24" font-size="11">Примеры: AVR, ARM</text>
+  <!-- CISC -->
+  <rect x="270" y="20" width="240" height="160" rx="10" fill="#1a2235" stroke="#f59e0b" stroke-width="2"/>
+  <text x="390" y="45" fill="#fbbf24" font-size="14" font-family="monospace" text-anchor="middle">CISC</text>
+  <text x="280" y="70" fill="#64748b" font-size="11">Команды: сложные</text>
+  <text x="280" y="88" fill="#64748b" font-size="11">Одна = несколько тактов</text>
+  <text x="280" y="106" fill="#10b981" font-size="11">+ Компактный код</text>
+  <text x="280" y="122" fill="#10b981" font-size="11">+ Меньше команд</text>
+  <text x="280" y="138" fill="#ef4444" font-size="11">- Сложнее конвейер</text>
+  <text x="280" y="158" fill="#fbbf24" font-size="11">Примеры: x86, Intel/AMD</text>
+</svg>`,
+
+pipeline: `<svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ap" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0, 7 2.5, 0 5" fill="#00d4ff"/></marker></defs>
+  <text x="10" y="20" fill="#94a3b8" font-size="12">Конвейер AVR (Harvard): 3 стадии одновременно</text>
+  <!-- Такт 1 -->
+  <rect x="10" y="35" width="100" height="35" rx="6" fill="#1a2235" stroke="#7c3aed" stroke-width="2"/>
+  <text x="60" y="57" fill="#a78bfa" font-size="12" text-anchor="middle">Fetch</text>
+  <text x="60" y="42" fill="#64748b" font-size="9" text-anchor="middle">Cmd 1</text>
+  <line x1="110" y1="52" x2="140" y2="52" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ap)"/>
+  <!-- Такт 2 -->
+  <rect x="140" y="35" width="100" height="35" rx="6" fill="#1a2235" stroke="#00d4ff" stroke-width="2"/>
+  <text x="190" y="57" fill="#00d4ff" font-size="12" text-anchor="middle">Decode</text>
+  <text x="190" y="42" fill="#64748b" font-size="9" text-anchor="middle">Cmd 1 / Fetch Cmd 2</text>
+  <line x1="240" y1="52" x2="270" y2="52" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ap)"/>
+  <!-- Такт 3 -->
+  <rect x="270" y="35" width="100" height="35" rx="6" fill="#1a2235" stroke="#10b981" stroke-width="2"/>
+  <text x="320" y="57" fill="#34d399" font-size="12" text-anchor="middle">Execute</text>
+  <text x="320" y="42" fill="#64748b" font-size="9" text-anchor="middle">Cmd 1</text>
+  <line x1="370" y1="52" x2="400" y2="52" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ap)"/>
+  <rect x="400" y="35" width="100" height="35" rx="6" fill="#1a2235" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="450" y="57" fill="#fbbf24" font-size="12" text-anchor="middle">Cmd 2...</text>
+  <text x="260" y="105" fill="#64748b" font-size="11" text-anchor="middle">Пока Cmd1 выполняется — Cmd2 уже декодируется, Cmd3 уже читается</text>
+</svg>`,
+
+photoSensor: `<svg viewBox="0 0 400 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фоторезистор -->
+  <text x="10" y="20" fill="#94a3b8" font-size="12">Фоторезистор в делителе напряжения:</text>
+  <!-- VCC -->
+  <text x="120" y="40" fill="#10b981" font-size="12" text-anchor="middle">+5В</text>
+  <line x1="120" y1="45" x2="120" y2="65" stroke="#10b981" stroke-width="2"/>
+  <!-- Фоторезистор (LDR) -->
+  <rect x="95" y="65" width="50" height="25" rx="3" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="120" y="82" fill="#fbbf24" font-size="11" text-anchor="middle">LDR</text>
+  <!-- Солнышко -->
+  <circle cx="60" cy="77" r="10" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="60" y1="60" x2="60" y2="55" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="60" y1="94" x2="60" y2="99" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="43" y1="77" x2="38" y2="77" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="77" y1="77" x2="82" y2="77" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="30" y="58" fill="#64748b" font-size="10">Свет</text>
+  <!-- Соединение -->
+  <line x1="120" y1="90" x2="120" y2="105" stroke="#00d4ff" stroke-width="2"/>
+  <circle cx="120" cy="105" r="3" fill="#00d4ff"/>
+  <!-- К АЦП -->
+  <line x1="120" y1="105" x2="200" y2="105" stroke="#00d4ff" stroke-width="2"/>
+  <text x="210" y="109" fill="#00d4ff" font-size="11">→ ADC pin МК</text>
+  <!-- R нижний -->
+  <line x1="120" y1="105" x2="120" y2="120" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="95" y="120" width="50" height="20" rx="3" fill="none" stroke="#a78bfa" stroke-width="2"/>
+  <text x="120" y="134" fill="#a78bfa" font-size="10" text-anchor="middle">10кОм</text>
+  <line x1="120" y1="140" x2="120" y2="155" stroke="#94a3b8" stroke-width="2"/>
+  <text x="120" y="158" fill="#94a3b8" font-size="11" text-anchor="middle">GND</text>
+  <text x="230" y="140" fill="#64748b" font-size="11">Темно → LDR большой → ADC маленький</text>
+  <text x="230" y="158" fill="#64748b" font-size="11">Светло → LDR малый → ADC большой</text>
+</svg>`,
+
+};
+
+// ========== ДАННЫЕ ==========
+const data = [
+
+{q:"1. САУ на МК — Системы автоматического управления",type:"control",a:`
+<h3>Что такое САУ?</h3>
+<p>САУ — это система, которая <b>сама</b> управляет чем-то без участия человека. Например, кондиционер сам поддерживает нужную температуру — это и есть САУ.</p>
+<div class="tip-box">🌡️ Простой пример: термостат в утюге. Вы выставили 200°С, а утюг сам включает и выключает нагрев, чтобы температура не превышала 200°С.</div>
+
+<h3>Как работает замкнутая САУ (шаг за шагом)</h3>
+<ol>
+  <li><b>Задание r(t)</b> — это то, что мы хотим (например, температура 25°С)</li>
+  <li><b>Датчик</b> — измеряет то, что есть сейчас (например, 22°С)</li>
+  <li><b>Ошибка e = r - y</b> — вычисляется разница (25 - 22 = 3°С — надо добавить тепла)</li>
+  <li><b>МК (регулятор)</b> — считает, насколько надо изменить управление</li>
+  <li><b>Исполнитель</b> — нагреватель, двигатель — выполняет команду МК</li>
+  <li><b>Объект</b> — комната нагрелась до 25°С</li>
+  <li>Снова <b>датчик</b> измеряет — цикл повторяется</li>
+</ol>
+
+<div class="formula">e(t) = r(t) - y(t)  &nbsp;&nbsp;&nbsp;  (ошибка = задание минус текущее значение)</div>
+
+<h3>Схема системы управления</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Структурная схема замкнутой САУ</div>${SVG.sauBlock}</div>
+
+<div class="warn-box">⚠️ Разомкнутая система — это без обратной связи. Как чайник без термостата: нагревает до кипения и всё. Замкнутая — точнее, но сложнее.</div>
+
+<h3>Виды регуляторов в МК</h3>
+<ul>
+  <li><b>П-регулятор:</b> u = K * e — просто умножает ошибку. Просто, но может быть остаточная ошибка.</li>
+  <li><b>ПИД-регулятор:</b> u = Kp*e + Ki*∫e + Kd*(de/dt) — учитывает ошибку, её накопление и скорость изменения. Самый популярный.</li>
+</ul>
+`},
+
+{q:"2. Интерфейс SPI — Serial Peripheral Interface",type:"interface",a:`
+<h3>Что такое SPI?</h3>
+<p>SPI (Serial Peripheral Interface) — это способ, которым микроконтроллер разговаривает с периферийными устройствами (дисплеями, SD-картами, АЦП). Это как разговор по телефону, только для электроники.</p>
+
+<div class="tip-box">📱 Аналогия: представьте, что вы начальник (Master) и у вас есть несколько подчинённых (Slave). Вы говорите, они слушают и отвечают. И всё это по 4 проводкам.</div>
+
+<h3>Четыре провода SPI</h3>
+<ul>
+  <li><b>MOSI</b> (Master Out Slave In) — <span style="color:#00d4ff">данные от мастера к слейву</span>. МК посылает команды.</li>
+  <li><b>MISO</b> (Master In Slave Out) — <span style="color:#10b981">ответ от слейва к мастеру</span>. Устройство отвечает.</li>
+  <li><b>SCK</b> (Serial Clock) — <span style="color:#fbbf24">тактовый сигнал</span>. Как метроном — задаёт ритм передачи.</li>
+  <li><b>SS/CS</b> (Slave Select / Chip Select) — <span style="color:#ef4444">выбор устройства</span>. При LOW — устройство активно.</li>
+</ul>
+
+<h3>Схема подключения SPI</h3>
+<div class="diagram-wrap"><div class="diagram-title">// SPI: Master ↔ Slave</div>${SVG.spiDiagram}</div>
+
+<h3>Как происходит передача данных</h3>
+<ol>
+  <li>Мастер опускает SS в LOW (выбирает устройство)</li>
+  <li>Мастер подаёт импульсы на SCK</li>
+  <li>По каждому импульсу передаётся 1 бит через MOSI</li>
+  <li>Одновременно через MISO устройство отвечает</li>
+  <li>Мастер поднимает SS в HIGH (устройство деактивировано)</li>
+</ol>
+
+<div class="formula">Скорость SPI: 1 МГц ... 70 МГц — намного быстрее I2C!</div>
+<div class="tip-box">✅ Плюсы SPI: высокая скорость, полный дуплекс (одновременная отправка и приём), простой протокол.<br>❌ Минусы: нужно 4 провода + по 1 линии SS на каждое устройство.</div>
+`},
+
+{q:"3. Классификация САУ",type:"control",a:`
+<h3>Главное деление: разомкнутые и замкнутые</h3>
+
+<p><b>Разомкнутые системы</b> — не знают, что происходит с объектом. Просто выполняют команду.</p>
+<ul>
+  <li>Пример: полив по таймеру. Поливает в 7 утра — не важно, дождь или засуха.</li>
+  <li>Плюс: просто. Минус: точности нет.</li>
+</ul>
+
+<p><b>Замкнутые системы (с обратной связью)</b> — знают, что происходит, и корректируют действие.</p>
+<ul>
+  <li>Пример: умный полив с датчиком влажности. Поливает только если земля сухая.</li>
+  <li>Плюс: точность. Минус: сложнее, может быть неустойчивой.</li>
+</ul>
+
+<div class="tip-box">🎯 Все нормальные системы управления — замкнутые. Обратная связь = ключ к точности.</div>
+
+<h3>Классификация по назначению</h3>
+<ul>
+  <li><b>Стабилизирующие</b> — поддерживают постоянное значение (термостат, стабилизатор напряжения)</li>
+  <li><b>Следящие</b> — следуют за изменяющимся заданием (роботизированная рука, автопилот)</li>
+  <li><b>Программные</b> — выполняют заданную программу (ЧПУ станок)</li>
+</ul>
+
+<h3>Классификация по типу сигналов</h3>
+<ul>
+  <li><b>Непрерывные</b> — аналоговые сигналы (старые аналоговые системы)</li>
+  <li><b>Дискретные (цифровые)</b> — сигнал квантован по времени (МК работают именно так)</li>
+  <li><b>Релейные</b> — только ВКЛ/ВЫКЛ (термостат с реле)</li>
+</ul>
+
+<h3>Устойчивость системы</h3>
+<p>Система должна быть устойчивой — иначе вместо стабилизации будут колебания, которые нарастают.</p>
+<div class="formula">Критерий устойчивости: все полюсы передаточной функции в левой полуплоскости</div>
+`},
+
+{q:"4. Интерфейс I2C — Inter-Integrated Circuit",type:"interface",a:`
+<h3>Что такое I2C?</h3>
+<p>I2C (Inter-Integrated Circuit) — интерфейс связи всего с <b>двумя проводами</b>. Разработан компанией Philips в 1982 году. Очень популярен для датчиков, дисплеев, памяти.</p>
+
+<div class="tip-box">🏙️ Аналогия: I2C — как городская сеть Wi-Fi. Все устройства подключены к одной сети, и каждое имеет свой адрес (как IP-адрес). Мастер обращается к нужному адресу.</div>
+
+<h3>Два провода I2C</h3>
+<ul>
+  <li><b>SDA</b> (Serial Data) — по этому проводу идут данные туда-обратно</li>
+  <li><b>SCL</b> (Serial Clock) — тактовый сигнал, задаёт ритм. Всегда от мастера.</li>
+</ul>
+
+<h3>Схема I2C шины</h3>
+<div class="diagram-wrap"><div class="diagram-title">// I2C: один мастер, несколько устройств на одной шине</div>${SVG.i2cDiagram}</div>
+
+<h3>Резисторы подтяжки — зачем они нужны?</h3>
+<p>Оба провода (SDA и SCL) должны быть подключены через резисторы к VCC. Это обязательно!</p>
+<ul>
+  <li>Без них шина не работает</li>
+  <li>Типичные значения: 4.7 кОм для скорости 100 кГц, 2.2 кОм для 400 кГц</li>
+  <li>Устройства только "притягивают" провод к земле, а подтяжка возвращает его к HIGH</li>
+</ul>
+
+<h3>Адресация устройств</h3>
+<p>Каждое I2C-устройство имеет уникальный 7-битный адрес (0x00 – 0x7F, то есть до 128 устройств на одной шине).</p>
+<div class="formula">Старт → [адрес 7 бит] + [R/W бит] → данные → Стоп</div>
+
+<h3>Скорости I2C</h3>
+<ul>
+  <li>Standard: 100 кГц</li>
+  <li>Fast: 400 кГц</li>
+  <li>Fast+: 1 МГц</li>
+  <li>High-speed: 3.4 МГц</li>
+</ul>
+<div class="warn-box">⚠️ I2C медленнее SPI, но экономит порты. На Arduino Wire.h уже всё встроено.</div>
+`},
+
+{q:"5. Микроконтроллер — что это такое",type:"mcu",a:`
+<h3>Микроконтроллер простыми словами</h3>
+<p>Микроконтроллер (МК) — это как маленький компьютер на одном чипе. В нём есть всё нужное: процессор, память, порты ввода-вывода. Он умеет читать датчики, считать и управлять устройствами.</p>
+
+<div class="tip-box">🤖 Аналогия: если компьютер — это огромный офис с кучей отделов, то МК — это маленький но шустрый офис в одной комнате. Всё на месте, всё компактно.</div>
+
+<h3>Что внутри микроконтроллера</h3>
+<ul>
+  <li><b>Процессор (CPU)</b> — мозг. Выполняет команды программы.</li>
+  <li><b>Flash-память</b> — здесь хранится ваша программа (не стирается без питания)</li>
+  <li><b>SRAM</b> — оперативная память. Здесь хранятся переменные во время работы. Стирается при выключении.</li>
+  <li><b>EEPROM</b> — медленная но постоянная память. Хранит настройки.</li>
+  <li><b>GPIO</b> — ножки, к которым подключаются кнопки, светодиоды, датчики</li>
+  <li><b>АЦП</b> — аналого-цифровой преобразователь. Читает аналоговые датчики.</li>
+  <li><b>Таймеры</b> — для PWM, задержек, измерения времени</li>
+  <li><b>Интерфейсы</b> — UART, SPI, I2C для связи с другими устройствами</li>
+</ul>
+
+<h3>Структурная схема ATmega328P</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Архитектура ATmega328P (Arduino)</div>${SVG.avr}</div>
+
+<h3>Как МК выполняет программу</h3>
+<ol>
+  <li>При включении питания — считывает первую команду из Flash-памяти</li>
+  <li>Выполняет команду</li>
+  <li>Переходит к следующей команде</li>
+  <li>Повторяет бесконечно</li>
+</ol>
+<div class="formula">Скорость = частота / количество тактов на команду &nbsp; (ATmega328P: 16 МГц)</div>
+`},
+
+{q:"6. Интерфейс UART — асинхронная последовательная связь",type:"interface",a:`
+<h3>Что такое UART?</h3>
+<p>UART (Universal Asynchronous Receiver-Transmitter) — самый старый и простой способ связи. Всего 2 провода данных + общий GND. Используется для связи МК с компьютером, GPS, Bluetooth-модулями.</p>
+
+<div class="tip-box">📨 Аналогия: UART — как переписка письмами. Письма идут последовательно, одно за другим. Получатель и отправитель заранее договорились, с какой скоростью передавать (baud rate).</div>
+
+<h3>Схема подключения UART</h3>
+<div class="diagram-wrap"><div class="diagram-title">// UART: TX одного → RX другого (крест!)</div>${SVG.uartDiagram}</div>
+
+<div class="warn-box">⚠️ ВАЖНО: TX одного устройства подключается к RX другого! Это называется "крестовое" подключение. Ошибка №1 новичков.</div>
+
+<h3>Структура кадра UART</h3>
+<ul>
+  <li><b>Старт-бит</b> — всегда 0. Сообщает: "начинается передача!"</li>
+  <li><b>Биты данных</b> — обычно 8 бит (1 байт)</li>
+  <li><b>Бит чётности</b> (опционально) — для проверки ошибок</li>
+  <li><b>Стоп-бит</b> — всегда 1. Сообщает: "передача закончена"</li>
+</ul>
+
+<h3>Скорость (Baud Rate)</h3>
+<p>Baud rate — количество бит в секунду. Оба устройства должны использовать одинаковую скорость!</p>
+<ul>
+  <li>Стандартные: 9600, 19200, 38400, 57600, 115200 бод</li>
+  <li>Самое частое для Arduino: <b>9600</b> и <b>115200</b></li>
+</ul>
+<div class="formula">При 9600 бод, один байт передаётся за ≈ 1.04 мс</div>
+`},
+
+{q:"7. Архитектуры процессоров: Harvard и Von Neumann",type:"mcu",a:`
+<h3>Две главные архитектуры</h3>
+<p>Архитектура — это то, как организована память и как к ней обращается процессор. Это влияет на скорость работы и потребление ресурсов.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Harvard vs Von Neumann</div>${SVG.archDiagram}</div>
+
+<h3>Архитектура Harvard</h3>
+<ul>
+  <li>Память программы (Flash) и память данных (SRAM) — <b>физически разные</b></li>
+  <li>Отдельные шины для программы и данных</li>
+  <li>CPU может одновременно читать следующую команду И обращаться к данным</li>
+  <li><b>Быстрее</b> за счёт параллельности</li>
+  <li>Используется в AVR, PIC, DSP процессорах</li>
+</ul>
+
+<h3>Архитектура Von Neumann (Принстонская)</h3>
+<ul>
+  <li>Программы и данные хранятся в <b>одной общей памяти</b></li>
+  <li>Одна общая шина — проще, но возможно "бутылочное горлышко"</li>
+  <li>Используется в классических ПК (x86), ARM Cortex-M0</li>
+</ul>
+
+<div class="tip-box">🏃 AVR — Harvard архитектура. Поэтому за один такт: ALU выполняет команду N, а шина команд уже загружает команду N+1. Это называется конвейер!</div>
+
+<h3>Конвейер инструкций AVR</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Конвейер: 3 стадии параллельно</div>${SVG.pipeline}</div>
+`},
+
+{q:"8. Интерфейс CAN — Controller Area Network",type:"interface",a:`
+<h3>Что такое CAN?</h3>
+<p>CAN — промышленный интерфейс связи, разработанный Bosch в 1983 году специально для автомобилей. Сегодня используется в машинах, роботах, медицинском оборудовании.</p>
+
+<div class="tip-box">🚗 В любом современном автомобиле работает CAN. Блок двигателя, ABS, подушки безопасности, климат-контроль — все разговаривают через CAN-шину.</div>
+
+<h3>Схема CAN шины</h3>
+<div class="diagram-wrap"><div class="diagram-title">// CAN: все устройства на одной витой паре</div>${SVG.canDiagram}</div>
+
+<h3>Ключевые особенности CAN</h3>
+<ul>
+  <li><b>Витая пара</b> (CAN H и CAN L) — две скрученные проволоки. Скрутка уменьшает помехи.</li>
+  <li><b>Терминаторы 120 Ом</b> — на обоих концах шины. Предотвращают отражения сигнала.</li>
+  <li><b>До 1 Мбит/с</b> на короткие расстояния, 5 кбит/с на 10 км</li>
+  <li><b>До 127 узлов</b> на одной шине</li>
+  <li><b>Нет мастера</b> — все устройства равноправны (мультимастер)</li>
+  <li><b>Приоритеты</b> — важные сообщения (тормоза!) всегда приоритетнее</li>
+  <li><b>Обнаружение ошибок</b> — встроенный CRC, автоматическая повторная отправка</li>
+</ul>
+
+<div class="formula">Дифференциальный сигнал: данные = разность напряжений CAN_H - CAN_L<br>0 (доминант): CAN_H=3.5В, CAN_L=1.5В → разность=2В<br>1 (рецессив): CAN_H=CAN_L=2.5В → разность=0В</div>
+`},
+
+{q:"10. RISC vs CISC и конвейерная обработка",type:"mcu",a:`
+<h3>RISC против CISC</h3>
+<p>Это два разных подхода к дизайну системы команд процессора.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Сравнение RISC и CISC</div>${SVG.riscCisc}</div>
+
+<h3>RISC (Reduced Instruction Set Computing)</h3>
+<p>Процессор умеет делать простые вещи, но делает их ОЧЕНЬ быстро — каждая команда за один такт.</p>
+<ul>
+  <li>Команды: ADD, SUB, LOAD, STORE, AND, OR, XOR...</li>
+  <li>Размер команды: фиксированный (у AVR = 16 или 32 бит)</li>
+  <li>Хорошо подходит для конвейера</li>
+  <li>AVR, ARM, MIPS, RISC-V — все RISC</li>
+</ul>
+
+<h3>CISC (Complex Instruction Set Computing)</h3>
+<p>Процессор умеет делать сложные операции одной командой — например, умножить, сохранить и перейти за один шаг.</p>
+<ul>
+  <li>x86 (ваш ПК/ноутбук) — CISC</li>
+  <li>Команды разной длины</li>
+  <li>Сложнее реализовать конвейер</li>
+</ul>
+
+<h3>Конвейер — почему это важно</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Трёхстадийный конвейер AVR</div>${SVG.pipeline}</div>
+
+<p>Без конвейера: выполнение 3 команд = 9 тактов. С конвейером: выполнение 3 команд = 5 тактов. Экономия огромная!</p>
+<div class="tip-box">🏭 Аналогия: конвейер на заводе. Один рабочий режет → второй сваривает → третий красит. Все работают одновременно с разными деталями.</div>
+`},
+
+{q:"11. Резистивные датчики и мост Уитстона",type:"sensors",a:`
+<h3>Резистор на схеме — как он выглядит?</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Обозначение резисторов на схемах</div>${SVG.resistor}</div>
+<div class="diagram-wrap"><div class="diagram-title">// Виды резисторов</div>${SVG.resistorTypes}</div>
+
+<h3>Что такое резистивный датчик?</h3>
+<p>Это датчик, который меняет своё сопротивление в зависимости от измеряемой величины. Мы измеряем сопротивление → узнаём величину.</p>
+
+<ul>
+  <li><b>Терморезистор (NTC/PTC)</b> — сопротивление меняется с температурой. NTC: чем горячее — тем меньше R. PTC — наоборот.</li>
+  <li><b>Фоторезистор (LDR)</b> — сопротивление уменьшается на свету. В темноте: 1 МОм, на свету: 1 кОм.</li>
+  <li><b>Тензодатчик (Strain gauge)</b> — при растяжении/сжатии сопротивление чуть меняется. Используется в весах.</li>
+  <li><b>Потенциометр</b> — переменный резистор, управляемый вручную.</li>
+</ul>
+
+<h3>Мост Уитстона — зачем он нужен?</h3>
+<p>Изменение сопротивления датчика очень маленькое (доли процента). Прямое измерение АЦП даст большую погрешность. Мост Уитстона позволяет измерить только <i>изменение</i> сопротивления с высокой точностью.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Мост Уитстона</div>${SVG.wheatstone}</div>
+
+<div class="formula">Условие баланса: R1/R2 = Rx/R3 → при балансе вольтметр показывает 0<br>Разбаланс → напряжение пропорционально изменению Rx</div>
+<div class="tip-box">✅ Используйте делитель напряжения с терморезистором + АЦП для простых измерений температуры. Для точных весов — мост Уитстона + операционный усилитель.</div>
+`},
+
+{q:"12. Цикл выполнения команды в AVR",type:"mcu",a:`
+<h3>Три стадии цикла команды</h3>
+<p>Каждая команда процессора проходит через три обязательных этапа. В AVR благодаря Harvard архитектуре они перекрываются (конвейер).</p>
+
+<ol>
+  <li>
+    <b>Fetch (Выборка)</b><br>
+    <p>Счётчик команд (PC — Program Counter) указывает на адрес следующей команды в Flash-памяти. Процессор читает опкод команды (16 или 32 бита) и записывает его в регистр инструкций IR. PC увеличивается на 1.</p>
+  </li>
+  <li>
+    <b>Decode (Декодирование)</b><br>
+    <p>Дешифратор команд смотрит на биты опкода и понимает: это ADD? LOAD? JMP? Определяет, какие регистры задействованы, какой тип операции.</p>
+  </li>
+  <li>
+    <b>Execute (Выполнение)</b><br>
+    <p>ALU (Арифметико-логическое устройство) выполняет операцию. Результат записывается в регистр. Флаги в SREG обновляются (ноль, перенос, переполнение...).</p>
+  </li>
+</ol>
+
+<div class="diagram-wrap"><div class="diagram-title">// Конвейер: перекрытие стадий</div>${SVG.pipeline}</div>
+
+<div class="tip-box">⚡ В AVR большинство команд выполняются за 1 такт. При частоте 16 МГц = 16 миллионов команд в секунду! Инструкции перехода (JMP, CALL) занимают 2-3 такта.</div>
+
+<h3>Важные регистры</h3>
+<ul>
+  <li><b>PC</b> (Program Counter) — адрес текущей команды</li>
+  <li><b>IR</b> (Instruction Register) — текущий опкод</li>
+  <li><b>SP</b> (Stack Pointer) — указатель стека</li>
+  <li><b>R0-R31</b> — регистры общего назначения</li>
+</ul>
+`},
+
+{q:"13. Фотодатчики и оптические сенсоры",type:"sensors",a:`
+<h3>Типы фотодатчиков</h3>
+<ul>
+  <li><b>Фоторезистор (LDR)</b> — самый простой. Сопротивление падает на свету. Инерционный (медленный).</li>
+  <li><b>Фотодиод</b> — быстрый, генерирует ток под светом. Используется в оптоволокне.</li>
+  <li><b>Фototранзистор</b> — усиливает ток фотодиода. Более чувствительный.</li>
+  <li><b>ИК-датчик (инфракрасный)</b> — видит ИК свет (невидимый глазом). Пульты ДУ, датчики препятствий.</li>
+</ul>
+
+<h3>Схема подключения фоторезистора к МК</h3>
+<div class="diagram-wrap"><div class="diagram-title">// Делитель напряжения с LDR</div>${SVG.photoSensor}</div>
+
+<h3>Как измерить освещённость?</h3>
+<p>Фоторезистор включается в делитель напряжения с обычным резистором. Напряжение в точке соединения зависит от соотношения сопротивлений. Это напряжение читает АЦП МК.</p>
+
+<div class="formula">U_ADC = VCC × R_нижний / (LDR + R_нижний)</div>
+
+<div class="tip-box">💡 Практические применения: автоматическое включение уличного освещения, управление яркостью экрана телефона, датчики в охранной сигнализации, подсчёт объектов (инфракрасный барьер).</div>
+`},
+
+{q:"14. Структура AVR микроконтроллера",type:"mcu",a:`
+<h3>Из чего состоит AVR?</h3>
+<p>AVR — это семейство 8-битных микроконтроллеров от Atmel (теперь Microchip). Разработаны специально для C-языка — почти каждая C-операция = 1 команда AVR.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Внутренняя структура ATmega328P</div>${SVG.avr}</div>
+
+<h3>Ключевые блоки</h3>
+<ul>
+  <li><b>ALU</b> (Arithmetic Logic Unit) — выполняет сложение, вычитание, AND, OR, XOR, сдвиги. 8-битный.</li>
+  <li><b>32 регистра общего назначения (R0-R31)</b> — быстрая память прямо в CPU. Особые: R26:R27=X, R28:R29=Y, R30:R31=Z (16-битные указатели).</li>
+  <li><b>Flash 32 КБ</b> — хранит программу. Пишется программатором. ~10 000 циклов перезаписи.</li>
+  <li><b>SRAM 2 КБ</b> — оперативная память. Переменные, стек. Стирается при отключении питания.</li>
+  <li><b>EEPROM 1 КБ</b> — энергонезависимая память. Для настроек.</li>
+  <li><b>ADC</b> — 10-битный, 6 каналов. Читает аналоговые датчики (0-5В → 0-1023).</li>
+  <li><b>Timers/Counters</b> — 3 штуки (Timer0=8бит, Timer1=16бит, Timer2=8бит). Для PWM и задержек.</li>
+  <li><b>UART, SPI, I2C (TWI)</b> — интерфейсы связи.</li>
+  <li><b>GPIO</b> — 23 программируемых пина (порты B, C, D).</li>
+</ul>
+
+<div class="formula">Тактовая частота: до 20 МГц (внешний кварц) или 8 МГц (внутренний RC)</div>
+`},
+
+{q:"15. LCD дисплей 16x2 — устройство и подключение",type:"interface",a:`
+<h3>Что такое LCD 16x2?</h3>
+<p>LCD 16x2 — жидкокристаллический дисплей, который показывает 2 строки по 16 символов. Стандарт — контроллер HD44780 (или совместимые). Используется везде: кофемашины, принтеры, измерительные приборы.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// LCD 16x2 и его подключение</div>${SVG.lcd}</div>
+
+<h3>Пины LCD и что они делают</h3>
+<ul>
+  <li><b>VSS</b> — GND (земля)</li>
+  <li><b>VDD</b> — питание +5В</li>
+  <li><b>V0</b> — контраст (подключить к потенциометру 10 кОм или к GND через 1-2 кОм)</li>
+  <li><b>RS</b> (Register Select) — 0=команда, 1=данные</li>
+  <li><b>RW</b> — 0=запись, 1=чтение. Обычно всегда GND (только пишем).</li>
+  <li><b>E</b> (Enable) — строб. Импульс HIGH → данные приняты.</li>
+  <li><b>D4-D7</b> — 4 линии данных (4-битный режим)</li>
+  <li><b>A</b> — анод подсветки (+5В через резистор 100-200 Ом)</li>
+  <li><b>K</b> — катод подсветки (GND)</li>
+</ul>
+
+<h3>Алгоритм инициализации LCD</h3>
+<ol>
+  <li>Ждём 50 мс после включения питания</li>
+  <li>Отправляем команду Function Set (4-битный режим)</li>
+  <li>Повторяем ещё раз (требование HD44780)</li>
+  <li>Устанавливаем количество строк и размер шрифта</li>
+  <li>Выключаем дисплей, очищаем, включаем</li>
+  <li>Устанавливаем режим ввода (сдвиг курсора вправо)</li>
+</ol>
+<div class="tip-box">💻 На Arduino: #include &lt;LiquidCrystal.h&gt;<br>LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);<br>lcd.begin(16, 2); lcd.print("Hello!");</div>
+`},
+
+{q:"16. ATmega328P — характеристики и особенности",type:"mcu",a:`
+<h3>ATmega328P — сердце Arduino</h3>
+<p>ATmega328P — самый популярный AVR микроконтроллер. Используется в Arduino Uno, Arduino Nano. Буква P = picopower (пониженное потребление).</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Структура ATmega328P</div>${SVG.avr}</div>
+
+<h3>Технические характеристики</h3>
+<ul>
+  <li><b>Архитектура:</b> AVR (RISC, Harvard), 8-битный</li>
+  <li><b>Частота:</b> до 20 МГц (Arduino Uno: 16 МГц с кварцем)</li>
+  <li><b>Flash:</b> 32 КБ (из них 0.5 КБ занимает загрузчик Arduino)</li>
+  <li><b>SRAM:</b> 2 КБ</li>
+  <li><b>EEPROM:</b> 1 КБ</li>
+  <li><b>GPIO:</b> 23 пина (порты B, C, D)</li>
+  <li><b>АЦП:</b> 10-бит, 6 каналов (PC0-PC5)</li>
+  <li><b>Таймеры:</b> 3 (0,1,2; Timer1 = 16 бит)</li>
+  <li><b>PWM:</b> 6 каналов</li>
+  <li><b>Интерфейсы:</b> UART, SPI, I2C</li>
+  <li><b>Питание:</b> 1.8-5.5В</li>
+  <li><b>Корпус:</b> DIP-28, TQFP-32, MLF-28</li>
+  <li><b>Потребление:</b> ~1 мА в активном режиме, 0.1 мкА в спящем</li>
+</ul>
+
+<div class="formula">Производительность: ~16 MIPS при 16 МГц (1 такт = 1 инструкция)</div>
+<div class="tip-box">🔑 Для минимальной схемы нужно: VCC, GND, конденсаторы 100нФ на питание, кварц 16 МГц с двумя конденсаторами 22 пФ, резистор 10 кОм на RESET.</div>
+`},
+
+{q:"17. Режимы подключения LCD (4-бит и 8-бит)",type:"interface",a:`
+<h3>Два режима работы LCD HD44780</h3>
+
+<h3>8-битный режим</h3>
+<ul>
+  <li>Используются все 8 линий данных: D0-D7</li>
+  <li>Передача символа = 1 пересылка (8 бит)</li>
+  <li>Быстрее, но занимает 8+3 = 11 пинов МК</li>
+</ul>
+
+<h3>4-битный режим (чаще используется)</h3>
+<ul>
+  <li>Используются только D4-D7 (старшие 4 бита)</li>
+  <li>Передача символа = 2 пересылки (сначала старшие 4 бита, потом младшие)</li>
+  <li>Чуть медленнее, но экономит 4 пина МК</li>
+  <li>На Arduino по умолчанию — 4-битный режим</li>
+</ul>
+
+<div class="diagram-wrap"><div class="diagram-title">// LCD подключение к Arduino (4-бит)</div>${SVG.lcd}</div>
+
+<h3>Временные диаграммы управления</h3>
+<p>Для передачи байта нужно:</p>
+<ol>
+  <li>Установить RS (1=данные, 0=команда)</li>
+  <li>Выставить данные на D4-D7</li>
+  <li>Дать импульс на EN (HIGH → пауза >450нс → LOW)</li>
+  <li>Для 4-бита: повторить для второго полубайта</li>
+</ol>
+<div class="warn-box">⚠️ LCD очень медленный! Между командами нужны задержки: обычно 2 мс, после очистки — 5 мс.</div>
+`},
+
+{q:"18. Минимальная схема для МК",type:"mcu",a:`
+<h3>Что нужно для запуска МК?</h3>
+<p>Чтобы микроконтроллер заработал, достаточно нескольких простых компонентов. Давайте разберём каждый.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Минимальная схема ATmega328P</div>${SVG.quartzCircuit}</div>
+
+<h3>Обязательные компоненты</h3>
+
+<p><b>1. Питание VCC и GND</b></p>
+<ul>
+  <li>VCC = 5В (или 3.3В для 3.3В версий)</li>
+  <li>Конденсатор 100 нФ (блокировочный) между VCC и GND — прямо у каждого пина питания. Фильтрует высокочастотные помехи.</li>
+  <li>Ещё 10 мкФ электролитический конденсатор на всю схему — для фильтрации низкочастотных помех.</li>
+</ul>
+
+<p><b>2. Кварцевый резонатор</b></p>
+<ul>
+  <li>Подключается к пинам XTAL1 и XTAL2</li>
+  <li>Два конденсатора 22 пФ: от каждого пина к GND</li>
+  <li>Без кварца МК работает от внутреннего генератора (8 МГц, менее стабильный)</li>
+</ul>
+
+<p><b>3. RESET</b></p>
+<ul>
+  <li>Резистор 10 кОм от RESET к VCC (подтяжка вверх — чтобы МК не сбрасывался сам)</li>
+  <li>Кнопка от RESET к GND (для ручного сброса)</li>
+  <li>Конденсатор 100 нФ от RESET к GND (фильтр помех)</li>
+</ul>
+
+<div class="tip-box">💡 Arduino — это и есть готовая минимальная схема + USB-UART конвертер для прошивки. Если делаете своё устройство, можете взять схему Arduino как основу.</div>
+`},
+
+{q:"19. Алгоритм работы с LCD",type:"interface",a:`
+<h3>Полный алгоритм инициализации и работы с HD44780</h3>
+
+<h3>Шаг 1: Инициализация (Init)</h3>
+<ol>
+  <li>Ждать >50 мс после включения питания</li>
+  <li>Послать 0x30 (Function Set для 8-бит) → ждать >4.1 мс</li>
+  <li>Послать 0x30 снова → ждать >100 мкс</li>
+  <li>Послать 0x30 ещё раз</li>
+  <li>Послать 0x20 (переключиться в 4-битный режим)</li>
+</ol>
+
+<h3>Шаг 2: Конфигурация</h3>
+<ol>
+  <li>Function Set: 4-бит, 2 строки, шрифт 5x8 → команда 0x28</li>
+  <li>Display OFF → команда 0x08</li>
+  <li>Clear Display → команда 0x01 → ждать >2 мс</li>
+  <li>Entry Mode Set (курсор вправо) → команда 0x06</li>
+  <li>Display ON → команда 0x0C</li>
+</ol>
+
+<h3>Шаг 3: Вывод текста</h3>
+<ol>
+  <li>Установить позицию курсора: команда 0x80 (строка 1) или 0xC0 (строка 2)</li>
+  <li>Перевести RS в 1 (режим данных)</li>
+  <li>Послать ASCII-код каждого символа</li>
+</ol>
+
+<div class="tip-box">💻 В Arduino всё это делает библиотека LiquidCrystal автоматически. Вручную нужно писать в ассемблере или голом C.</div>
+<div class="formula">Позиция курсора: Row 1 = 0x80+col, Row 2 = 0xC0+col (col = 0-15)</div>
+`},
+
+{q:"20. Arduino Uno — плата разработчика",type:"mcu",a:`
+<h3>Что такое Arduino Uno?</h3>
+<p>Arduino Uno — это плата разработчика на базе ATmega328P. Она содержит всё необходимое для работы МК + USB-интерфейс для прошивки через компьютер + удобные разъёмы для подключения компонентов.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Структура ATmega328P внутри Arduino</div>${SVG.avr}</div>
+
+<h3>Что есть на плате Arduino Uno</h3>
+<ul>
+  <li><b>ATmega328P</b> — главный МК</li>
+  <li><b>ATmega16U2</b> — второй МК, делает USB → UART. Именно через него вы заливаете программы.</li>
+  <li><b>Кварц 16 МГц</b> для ATmega328P</li>
+  <li><b>Разъём USB-B</b> — для подключения к компьютеру</li>
+  <li><b>Разъём питания</b> — 7-12В (преобразуется в 5В)</li>
+  <li><b>14 цифровых пинов</b> (D0-D13), из них 6 с PWM (D3,D5,D6,D9,D10,D11)</li>
+  <li><b>6 аналоговых пинов</b> (A0-A5) — входы АЦП</li>
+  <li><b>Кнопка RESET</b></li>
+  <li><b>Встроенный светодиод</b> на D13</li>
+  <li><b>Пины 3.3В и 5В</b> для питания компонентов</li>
+</ul>
+
+<div class="tip-box">🚀 Arduino — идеальная отправная точка. Когда научитесь — перейдёте на голый МК в своих устройствах, без лишних деталей.</div>
+`},
+
+{q:"21. 7-сегментный индикатор",type:"interface",a:`
+<h3>Как устроен 7-сегментный индикатор?</h3>
+<p>7-сегментный индикатор — это 7 светодиодов в форме восьмёрки + 1 точка. Включая разные комбинации, можно показывать цифры 0-9 и некоторые буквы.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// 7-сегментный индикатор: сегменты и схема</div>${SVG.sevenSeg}</div>
+
+<h3>Два типа: с общим анодом и общим катодом</h3>
+<ul>
+  <li><b>Общий катод (Common Cathode)</b> — общий вывод к GND. Чтобы зажечь сегмент — подаём HIGH.</li>
+  <li><b>Общий анод (Common Anode)</b> — общий вывод к VCC. Чтобы зажечь сегмент — подаём LOW.</li>
+</ul>
+
+<h3>Таблица сегментов для цифр</h3>
+<p>Цифра 0: a,b,c,d,e,f включены (g выключен)<br>
+Цифра 1: b,c включены<br>
+Цифра 7: a,b,c включены<br>
+Цифра 8: все включены</p>
+
+<h3>Динамическая индикация (для нескольких цифр)</h3>
+<p>Если нужно показать 4 цифры — не делают 4×8 = 32 пина. Делают по-умному: зажигают по очереди каждую цифру так быстро, что глаз не замечает мигания (>50 Гц).</p>
+<div class="formula">При 4 цифрах: каждая горит 1/4 времени. Частота переключения >50 Гц → нет мерцания</div>
+<div class="warn-box">⚠️ Каждый сегмент — это светодиод! Обязательно последовательный резистор 220-470 Ом, иначе сгорит МК.</div>
+`},
+
+{q:"23. GPIO — порты ввода-вывода общего назначения",type:"mcu",a:`
+<h3>Что такое GPIO?</h3>
+<p>GPIO (General Purpose Input/Output) — это ножки (пины) микроконтроллера, которые можно настроить как входы или выходы и читать/записывать состояние.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// GPIO: вход и выход с регистрами AVR</div>${SVG.gpio}</div>
+
+<h3>Три регистра управления GPIO в AVR (порт B как пример)</h3>
+<ul>
+  <li><b>DDRB</b> (Data Direction Register B) — настраивает направление. 1 = выход, 0 = вход.</li>
+  <li><b>PORTB</b> — для выхода: 1 = HIGH (5В), 0 = LOW (0В). Для входа: 1 = включить внутренний pull-up резистор.</li>
+  <li><b>PINB</b> — только для чтения! Показывает текущее состояние пинов.</li>
+</ul>
+
+<h3>Примеры кода (голый AVR)</h3>
+<div class="formula">DDRB |= (1&lt;&lt;PB0);    // PB0 = выход<br>PORTB |= (1&lt;&lt;PB0);   // PB0 = HIGH (LED включён)<br>PORTB &= ~(1&lt;&lt;PB0);  // PB0 = LOW (LED выключён)<br><br>DDRB &= ~(1&lt;&lt;PB1);   // PB1 = вход<br>if (PINB & (1&lt;&lt;PB1)) // читаем PB1</div>
+
+<h3>Нагрузочная способность пинов</h3>
+<ul>
+  <li>Максимум на 1 пин: 40 мА</li>
+  <li>Максимум на весь МК: 200 мА</li>
+  <li>Для LED: типично 10-20 мА (резистор 220-470 Ом)</li>
+</ul>
+<div class="warn-box">⚠️ Нельзя подключать моторы напрямую к GPIO! Нужен драйвер (L298N, MOSFET). Мотор потребляет амперы, пин даст только 40 мА и сгорит.</div>
+`},
+
+{q:"24. Pull-up и Pull-down резисторы",type:"mcu",a:`
+<h3>Проблема: плавающий вход</h3>
+<p>Если пин МК настроен как вход, но ни к чему не подключён — он "плавает". Его состояние случайное: иногда 0, иногда 1, шумит. Это катастрофа для программы.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Pull-up резистор с кнопкой</div>${SVG.pullup}</div>
+
+<h3>Pull-up резистор</h3>
+<p>Подключает пин к VCC через резистор. Без нажатия кнопки — пин получает +5В (логическая 1). При нажатии кнопки — пин соединяется с GND (логический 0).</p>
+<ul>
+  <li>Типичное значение: 4.7 кОм – 100 кОм</li>
+  <li>В AVR есть <b>встроенные</b> pull-up резисторы (~50 кОм)! Включаем: PORTB |= (1&lt;&lt;PB1) при DDRB=вход.</li>
+</ul>
+
+<div class="diagram-wrap"><div class="diagram-title">// Обозначение резистора на схемах</div>${SVG.resistor}</div>
+
+<h3>Pull-down резистор</h3>
+<p>Подключает пин к GND. Без кнопки — пин 0. При нажатии — пин соединяется с VCC → 1.</p>
+<ul>
+  <li>В AVR встроенных pull-down нет — только внешние.</li>
+</ul>
+
+<div class="tip-box">🔑 Правило: всегда используйте pull-up или pull-down на кнопках и незадействованных входах. Иначе программа будет вести себя странно.</div>
+<div class="formula">При нажатии кнопки ток через pull-up: I = VCC / R = 5В / 10кОм = 0.5 мА — безопасно</div>
+`},
+
+{q:"25. Интерфейсы МК: обзор и сравнение",type:"mcu",a:`
+<h3>Зачем нужны интерфейсы?</h3>
+<p>Интерфейс — стандартный способ передачи данных между устройствами. Без стандартов каждый производитель делал бы по-своему и ничего не работало бы вместе.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// UART: простейшая связь двух устройств</div>${SVG.uartDiagram}</div>
+
+<h3>Сравнение основных интерфейсов</h3>
+<ul>
+  <li>
+    <b>UART</b> — 2 провода (TX, RX), асинхронный, до ~1 Мбод. Для связи МК-ПК, GPS, Bluetooth. Прост, надёжен.
+  </li>
+  <li>
+    <b>SPI</b> — 4 провода (MOSI, MISO, SCK, SS), синхронный, до 70 Мбит/с. Для дисплеев, SD-карт, Flash. Быстро.
+  </li>
+  <li>
+    <b>I2C</b> — 2 провода (SDA, SCL), синхронный, до 3.4 Мбит/с. Для датчиков, EEPROM. Много устройств на 2 проводах.
+  </li>
+  <li>
+    <b>CAN</b> — 2 провода (витая пара), дифференциальный, до 1 Мбит/с. Для автомобилей, промышленности. Помехоустойчив.
+  </li>
+  <li>
+    <b>1-Wire</b> — 1 провод! Очень медленный. Для термодатчиков DS18B20.
+  </li>
+</ul>
+
+<h3>Как выбрать интерфейс?</h3>
+<ul>
+  <li>Нужна скорость → SPI</li>
+  <li>Нужно много устройств, мало проводов → I2C</li>
+  <li>Нужна связь с ПК/модулем → UART</li>
+  <li>Нужна помехоустойчивость в авто/промышленности → CAN</li>
+</ul>
+`},
+
+{q:"26. SREG — регистр состояния процессора",type:"mcu",a:`
+<h3>Что такое SREG?</h3>
+<p>SREG (Status Register) — 8-битный регистр, каждый бит которого — это флаг. Флаги автоматически устанавливаются/сбрасываются после выполнения арифметических и логических операций. Без флагов невозможны условные переходы (if/else).</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// SREG: 8 флагов</div>${SVG.sregDiagram}</div>
+
+<h3>Назначение каждого флага</h3>
+<ul>
+  <li><b>I (бит 7)</b> — Global Interrupt Enable. 1 = прерывания разрешены. CLI() сбрасывает, SEI() устанавливает.</li>
+  <li><b>T (бит 6)</b> — Temporary bit. Используется командами BLD/BST для копирования бит.</li>
+  <li><b>H (бит 5)</b> — Half Carry. Перенос из бита 3 в бит 4 (нужен для BCD-арифметики).</li>
+  <li><b>S (бит 4)</b> — Sign bit. S = N XOR V. Знак результата со знаком.</li>
+  <li><b>V (бит 3)</b> — Overflow. Переполнение при операциях со знаком.</li>
+  <li><b>N (бит 2)</b> — Negative. Результат отрицателен (старший бит = 1).</li>
+  <li><b>Z (бит 1)</b> — Zero. Результат равен нулю. Используется в условиях (if a == b → Z=1).</li>
+  <li><b>C (бит 0)</b> — Carry. Перенос при сложении или заём при вычитании.</li>
+</ul>
+
+<div class="formula">Пример: 255 + 1 = 0 → Z=1, C=1 (перенос в 9-й бит, которого нет)</div>
+<div class="tip-box">💡 Компилятор C автоматически использует флаги. Команда BRNE (Branch if Not Equal) проверяет флаг Z. BRCS проверяет C. Вам не нужно с ними работать напрямую.</div>
+`},
+
+{q:"27. Память микроконтроллера AVR",type:"mcu",a:`
+<h3>Три типа памяти в AVR</h3>
+<p>У AVR три разных вида памяти, каждая для своей цели. Их путают чаще всего — запомните раз и навсегда.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Три типа памяти ATmega328P</div>${SVG.memoryMap}</div>
+
+<h3>Flash-память (Программная память)</h3>
+<ul>
+  <li>Размер: 32 КБ у ATmega328P</li>
+  <li>Хранит: машинный код вашей программы</li>
+  <li>Пишется: программатором (или через загрузчик Arduino)</li>
+  <li>Хранится: без питания сколько угодно</li>
+  <li>Ресурс: ~10 000 циклов перезаписи</li>
+  <li>Скорость чтения: 1 такт (очень быстро)</li>
+</ul>
+
+<h3>SRAM (Оперативная память)</h3>
+<ul>
+  <li>Размер: 2 КБ у ATmega328P</li>
+  <li>Хранит: переменные, стек, кучу (malloc)</li>
+  <li>Стирается: при выключении питания!</li>
+  <li>Скорость: 1-2 такта</li>
+  <li>Это дефицитный ресурс — берегите его!</li>
+</ul>
+
+<h3>EEPROM</h3>
+<ul>
+  <li>Размер: 1 КБ</li>
+  <li>Хранит: настройки, калибровки — то, что нужно помнить без питания</li>
+  <li>Ресурс: 100 000 циклов</li>
+  <li>Медленная: запись 3.4 мс на байт</li>
+</ul>
+
+<div class="warn-box">⚠️ Самая частая ошибка: переполнение SRAM. 2 КБ заканчивается быстро. Строки храните в Flash через PROGMEM. Избегайте больших массивов и рекурсии.</div>
+`},
+
+{q:"28. EEPROM — энергонезависимая память",type:"mcu",a:`
+<h3>Зачем нужна EEPROM?</h3>
+<p>EEPROM (Electrically Erasable Programmable Read-Only Memory) — это память, которая хранит данные после отключения питания. Идеально для настроек, калибровочных коэффициентов, состояния системы.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// EEPROM: ячейки памяти</div>${SVG.eepromDiagram}</div>
+
+<h3>Характеристики EEPROM в ATmega328P</h3>
+<ul>
+  <li>Размер: 1024 байта (1 КБ)</li>
+  <li>Адреса: 0x000 – 0x3FF</li>
+  <li>Ресурс: минимум 100 000 циклов записи на ячейку</li>
+  <li>Время записи: ~3.4 мс на байт (очень медленно!)</li>
+  <li>Время чтения: 1 такт</li>
+</ul>
+
+<h3>Работа с EEPROM в Arduino</h3>
+<div class="formula">#include &lt;EEPROM.h&gt;<br><br>EEPROM.write(0, 42);    // записываем число 42 в адрес 0<br>byte val = EEPROM.read(0); // читаем из адреса 0<br><br>// Для float, struct — используем EEPROM.put() / EEPROM.get()</div>
+
+<h3>Работа с EEPROM на чистом AVR</h3>
+<div class="formula">#include &lt;avr/eeprom.h&gt;<br>eeprom_write_byte((uint8_t*)0, 42);<br>uint8_t val = eeprom_read_byte((uint8_t*)0);</div>
+
+<div class="warn-box">⚠️ НЕ пишите в EEPROM в основном цикле loop() постоянно! 100 000 циклов звучит много, но при записи 10 раз в секунду — это всего 2.8 часа до исчерпания ресурса. Пишите только при изменении значения.</div>
+`},
+
+{q:"29. Таймеры и счётчики в AVR",type:"mcu",a:`
+<h3>Зачем нужны таймеры?</h3>
+<p>Таймер — это счётчик в МК, который считает тактовые импульсы независимо от программы. Это позволяет делать точные временные задержки, генерировать PWM, измерять время.</p>
+
+<div class="tip-box">⏱️ Аналогия: таймер — как секундомер, который тикает сам по себе, пока вы делаете другие дела. Когда он досчитает до нужного числа — даст сигнал.</div>
+
+<div class="diagram-wrap"><div class="diagram-title">// Таймер и PWM</div>${SVG.timerDiagram}</div>
+
+<h3>Три таймера в ATmega328P</h3>
+<ul>
+  <li><b>Timer0</b> — 8-битный. Считает 0-255. Используется Arduino для delay() и millis(). PWM на D5, D6.</li>
+  <li><b>Timer1</b> — 16-битный. Считает 0-65535. Для точного PWM, измерения времени. PWM на D9, D10.</li>
+  <li><b>Timer2</b> — 8-битный. Похож на Timer0. PWM на D3, D11. Может работать от внешнего кварца 32кГц (часы).</li>
+</ul>
+
+<h3>Режимы работы таймера</h3>
+<ul>
+  <li><b>Normal</b> — просто считает 0 → MAX → переполнение → снова 0</li>
+  <li><b>CTC</b> (Clear Timer on Compare) — сбрасывается при достижении OCR (Output Compare Register)</li>
+  <li><b>Fast PWM</b> — генерирует ШИМ-сигнал</li>
+  <li><b>Phase Correct PWM</b> — ШИМ с правильной фазой</li>
+</ul>
+
+<h3>Делитель тактовой частоты (Prescaler)</h3>
+<div class="formula">f_таймера = f_CPU / Prescaler<br>При f=16МГц, prescaler=1024: таймер тикает 15625 раз/сек<br>8-битный таймер переполняется: 15625/256 ≈ 61 раз/сек</div>
+`},
+
+{q:"30. 8-битный таймер: принцип работы",type:"mcu",a:`
+<h3>Как работает 8-битный таймер?</h3>
+<p>8-битный таймер содержит 8-битный регистр счётчика TCNT0, который считает от 0 до 255 (2^8 - 1). Когда досчитал до 255 — следующий шаг снова 0 (переполнение, OVF).</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Счётчик и PWM сигнал</div>${SVG.timerDiagram}</div>
+
+<h3>Ключевые регистры Timer0</h3>
+<ul>
+  <li><b>TCNT0</b> — текущее значение счётчика (0-255)</li>
+  <li><b>OCR0A, OCR0B</b> — регистры сравнения. Когда TCNT0 == OCR0A → событие!</li>
+  <li><b>TCCR0A</b> — настройки: режим (Normal/CTC/PWM), что делать при совпадении</li>
+  <li><b>TCCR0B</b> — выбор делителя (prescaler)</li>
+  <li><b>TIMSK0</b> — маска прерываний (разрешить прерывание при переполнении или совпадении)</li>
+  <li><b>TIFR0</b> — флаги прерываний (TOV0, OCF0A, OCF0B)</li>
+</ul>
+
+<h3>Пример: точная задержка 1 мс</h3>
+<div class="formula">f_CPU = 16 МГц, prescaler = 64<br>f_таймера = 16000000/64 = 250000 Гц<br>1 тик = 4 мкс<br>За 1 мс нужно: 1000/4 = 250 тиков<br>OCR0A = 249 (сброс через 250 тиков)</div>
+
+<h3>PWM через 8-битный таймер</h3>
+<p>В режиме Fast PWM: когда TCNT0 &lt; OCR0A → выход HIGH, когда ≥ OCR0A → LOW. Меняя OCR0A — меняем скважность (duty cycle).</p>
+<div class="formula">analogWrite(5, 127); // D5 (Timer0): OCR0B = 127 → 50% PWM</div>
+`},
+
+{q:"31. Прерывания в МК",type:"mcu",a:`
+<h3>Что такое прерывание?</h3>
+<p>Прерывание (Interrupt) — это механизм, позволяющий МК мгновенно реагировать на события без постоянной проверки в цикле. Событие случилось → процессор "прерывает" текущую задачу → выполняет обработчик прерывания (ISR) → возвращается к прежней задаче.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Механизм прерывания</div>${SVG.interruptDiagram}</div>
+
+<div class="tip-box">🚨 Аналогия: вы читаете книгу (main loop). Вдруг звонит телефон (прерывание). Вы кладёте палец в книгу, отвечаете на звонок (ISR), вешаете трубку и продолжаете читать с того же места.</div>
+
+<h3>Источники прерываний в ATmega328P</h3>
+<ul>
+  <li><b>Внешние прерывания INT0 (D2), INT1 (D3)</b> — по уровню или фронту сигнала</li>
+  <li><b>Pin Change Interrupts (PCINT)</b> — любой пин может генерировать прерывание</li>
+  <li><b>Прерывания таймеров</b> — переполнение (OVF), совпадение (COMPA/B)</li>
+  <li><b>Прерывание АЦП</b> — когда завершилось преобразование</li>
+  <li><b>UART</b> — получен байт, отправка завершена</li>
+  <li><b>SPI, I2C</b> — различные события</li>
+</ul>
+
+<h3>Важные правила ISR</h3>
+<ul>
+  <li>ISR должен быть <b>коротким</b>. Не задерживайте МК в прерывании!</li>
+  <li>Не используйте delay() в ISR</li>
+  <li>Переменные, общие с main() — объявить как <b>volatile</b></li>
+  <li>Во время выполнения ISR — прерывания по умолчанию запрещены</li>
+</ul>
+
+<div class="formula">volatile bool flag = false;<br>ISR(INT0_vect) { flag = true; }  // Arduino<br>// Или: attachInterrupt(0, myISR, RISING);</div>
+`},
+
+{q:"32. Алгоритм обработки прерывания",type:"mcu",a:`
+<h3>Что происходит при прерывании (пошагово)</h3>
+
+<div class="diagram-wrap"><div class="diagram-title">// Механизм прерывания</div>${SVG.interruptDiagram}</div>
+
+<ol>
+  <li>
+    <b>Событие</b> — произошло что-то (нажата кнопка, таймер переполнился, пришёл байт UART)
+  </li>
+  <li>
+    <b>Флаг прерывания устанавливается</b> — в регистре TIFR, EIFR или другом соответствующем регистре
+  </li>
+  <li>
+    <b>CPU проверяет флаг I (SREG)</b> — если глобальные прерывания разрешены (SEI был вызван)
+  </li>
+  <li>
+    <b>Завершение текущей команды</b> — CPU заканчивает текущую инструкцию (атомарность)
+  </li>
+  <li>
+    <b>Сохранение контекста</b> — PC (Program Counter) помещается на стек автоматически
+  </li>
+  <li>
+    <b>Флаг I сбрасывается</b> — новые прерывания блокируются
+  </li>
+  <li>
+    <b>Переход к вектору прерывания</b> — таблица векторов в начале Flash, там стоит JMP на ISR
+  </li>
+  <li>
+    <b>Выполнение ISR</b> — ваш код обработчика
+  </li>
+  <li>
+    <b>RETI</b> — команда возврата из прерывания. Восстанавливает PC, устанавливает флаг I обратно
+  </li>
+  <li>
+    <b>Продолжение основной программы</b> — с того места, где остановились
+  </li>
+</ol>
+
+<div class="tip-box">🔧 В C компилятор автоматически сохраняет и восстанавливает регистры, которые использует ISR (SREG, R0, R1, и другие). В ассемблере это нужно делать вручную!</div>
+
+<div class="warn-box">⚠️ Приоритеты: у INT0 вектор раньше в таблице → он "приоритетнее". Но в AVR нет аппаратной вытесняющей многоуровневой приоритетности — одно прерывание блокирует другие.</div>
+`},
+
+{q:"33. Fuse-биты микроконтроллера",type:"mcu",a:`
+<h3>Что такое Fuse-биты?</h3>
+<p>Fuse-биты — это специальные конфигурационные биты, которые определяют поведение МК на самом низком уровне. Они устанавливаются один раз программатором и не меняются при перепрошивке обычной программы.</p>
+
+<div class="warn-box">🚨 ОСТОРОЖНО: неправильная установка Fuse-битов может "заблокировать" МК. Например, если выбрать внешний тактовый источник без подключённого кварца — МК перестанет работать и его нельзя будет перепрошить обычным способом.</div>
+
+<h3>Основные Fuse-биты ATmega328P</h3>
+
+<p><b>Low Fuse:</b></p>
+<ul>
+  <li>CKSEL[3:0] — выбор источника тактирования (кварц, RC-генератор, внешний)</li>
+  <li>SUT[1:0] — время задержки старта</li>
+  <li>CKOUT — вывод тактового сигнала на пин</li>
+  <li>CKDIV8 — делить тактовую на 8 (по умолчанию включён!)</li>
+</ul>
+
+<p><b>High Fuse:</b></p>
+<ul>
+  <li>BOOTRST — запускаться с загрузчика или с адреса 0</li>
+  <li>BOOTSZ — размер области загрузчика</li>
+  <li>EESAVE — сохранять EEPROM при стирании Flash (важно!)</li>
+  <li>WDTON — всегда включён watchdog</li>
+  <li>SPIEN — разрешить программирование по SPI (не отключайте!)</li>
+</ul>
+
+<p><b>Extended Fuse:</b></p>
+<ul>
+  <li>BODLEVEL — порог сброса при низком напряжении питания</li>
+</ul>
+
+<div class="formula">Значение по умолчанию ATmega328P: Low=0x62, High=0xD9, Ext=0xFF<br>Arduino Uno (с загрузчиком): Low=0xFF, High=0xDE, Ext=0x05</div>
+<div class="tip-box">💻 Проверить/поменять fuses: avrdude -p m328p -c usbasp -U lfuse:r:-:h<br>Онлайн-калькулятор fuse-битов: fusecalc.wayoda.org</div>
+`},
+
+{q:"34. Тактирование микроконтроллера",type:"mcu",a:`
+<h3>Что такое тактирование?</h3>
+<p>Тактовый сигнал — это периодический прямоугольный сигнал, по каждому фронту которого МК выполняет один шаг. Без тактового сигнала МК не работает вообще.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Кварц и конденсаторы</div>${SVG.quartzCircuit}</div>
+
+<h3>Источники тактового сигнала в AVR</h3>
+
+<p><b>1. Кварцевый резонатор (External Crystal)</b></p>
+<ul>
+  <li>Самый точный и стабильный</li>
+  <li>Подключается к XTAL1/XTAL2 + два конденсатора 22 пФ</li>
+  <li>Точность: ±20-50 ppm (0.002-0.005%)</li>
+  <li>Диапазон для AVR: 0.4 – 20 МГц</li>
+</ul>
+
+<p><b>2. Внутренний RC-генератор</b></p>
+<ul>
+  <li>Встроен в кристалл, не требует внешних компонентов</li>
+  <li>8 МГц (по умолчанию делится на 8 → 1 МГц из-за fuse CKDIV8!)</li>
+  <li>Точность: ±10% — плохо для UART, нормально для простых задач</li>
+</ul>
+
+<p><b>3. Внешний тактовый генератор</b></p>
+<ul>
+  <li>Готовый генератор подаётся на XTAL1</li>
+  <li>Для систем где нужна синхронизация с другими устройствами</li>
+</ul>
+
+<div class="formula">Время одного такта = 1 / f_CPU<br>При 16 МГц: 1/16000000 = 62.5 нс на такт<br>При 1 МГц: 1 мкс на такт</div>
+`},
+
+{q:"35. Кварцевый резонатор",type:"mcu",a:`
+<h3>Что такое кварц?</h3>
+<p>Кварцевый резонатор — это маленький кристалл кварца (SiO₂), который механически колеблется с очень точной и стабильной частотой при подаче на него напряжения. Это явление называется пьезоэлектрическим эффектом.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Подключение кварца к МК</div>${SVG.quartzCircuit}</div>
+
+<h3>Почему кварц лучше RC-генератора?</h3>
+<ul>
+  <li>RC-генератор: точность ±10%. При 9600 бод UART: ошибка ±960 бод → байты портятся</li>
+  <li>Кварц: точность ±0.005%. При 9600 бод: ошибка ±0.5 бод → всё работает идеально</li>
+  <li>RC дрейфует с температурой. Кварц — стабилен.</li>
+</ul>
+
+<h3>Схема подключения</h3>
+<ul>
+  <li>Кварц между XTAL1 и XTAL2</li>
+  <li>Конденсатор C1 от XTAL1 к GND: 22 пФ</li>
+  <li>Конденсатор C2 от XTAL2 к GND: 22 пФ</li>
+  <li>Расположить как можно ближе к МК</li>
+  <li>Не класть под кварц дорожки (экранирование от наводок)</li>
+</ul>
+
+<div class="formula">Нагрузочная ёмкость: CL = (C1 × C2)/(C1 + C2) + Cстрой<br>Обычно: CL = 18-22 пФ → C1 = C2 = 22-27 пФ</div>
+
+<div class="tip-box">💡 Виды: HC-49S (обычный), SMD кварц, кварцевый генератор (3 пина, уже с встроенной схемой — подаёшь питание и сразу получаешь меандр). Arduino Uno использует HC-49S 16 МГц.</div>
+`},
+
+{q:"36. Сервопривод",type:"sensors",a:`
+<h3>Что такое сервопривод?</h3>
+<p>Сервопривод — это мотор с встроенным редуктором, потенциометром и схемой управления. Он может точно повернуться на заданный угол (обычно 0-180°) и удерживать позицию.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Сервопривод: подключение и управление</div>${SVG.servo}</div>
+
+<h3>Три провода сервопривода</h3>
+<ul>
+  <li><b>VCC (красный)</b> — питание 5В</li>
+  <li><b>GND (чёрный/коричневый)</b> — земля</li>
+  <li><b>Signal (жёлтый/оранжевый/белый)</b> — PWM-сигнал управления</li>
+</ul>
+
+<h3>Как работает управление (PWM)</h3>
+<p>Сервопривод ждёт импульс каждые 20 мс (50 Гц). Длина импульса определяет угол:</p>
+<ul>
+  <li>1 мс → 0°</li>
+  <li>1.5 мс → 90° (центр)</li>
+  <li>2 мс → 180°</li>
+</ul>
+
+<h3>Как это работает внутри сервы</h3>
+<ol>
+  <li>Схема измеряет длину входного импульса</li>
+  <li>Потенциометр на оси даёт текущий угол</li>
+  <li>Если угол не совпадает с заданным — мотор вращается</li>
+  <li>Когда совпало — мотор останавливается</li>
+</ol>
+
+<div class="formula">// Arduino:<br>#include &lt;Servo.h&gt;<br>Servo myservo;<br>myservo.attach(9);<br>myservo.write(90);  // повернуть на 90°</div>
+
+<div class="tip-box">💡 Не питайте мощный сервопривод от пина Arduino! Серво потребляет 100-600 мА — питайте отдельно от блока питания, GND соединить общий.</div>
+`},
+
+{q:"37. Шаговый двигатель",type:"sensors",a:`
+<h3>Что такое шаговый двигатель?</h3>
+<p>Шаговый двигатель вращается не плавно, а фиксированными шагами (step). Каждый импульс управления = поворот на фиксированный угол. Можно точно контролировать позицию без датчика обратной связи.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Шаговый двигатель и последовательность шагов</div>${SVG.stepperDiagram}</div>
+
+<h3>Основные параметры</h3>
+<ul>
+  <li><b>Угол шага</b> — типично 1.8° (200 шагов на оборот) или 0.9° (400 шагов)</li>
+  <li><b>Обмотки</b> — 2 обмотки (биполярный) или 4 обмотки (унипolar)</li>
+  <li><b>Ток</b> — от 0.5А до 4А на обмотку</li>
+</ul>
+
+<h3>Режимы шага</h3>
+<ul>
+  <li><b>Полный шаг (Full step)</b> — включены 2 обмотки, 200 шагов/оборот</li>
+  <li><b>Полушаг (Half step)</b> — чередование 1 и 2 обмоток, 400 шагов/оборот, плавнее</li>
+  <li><b>Микрошаг (Microstepping)</b> — ШИМ на обмотках, 1600+ шагов/оборот, очень плавно</li>
+</ul>
+
+<h3>Драйвер шагового двигателя</h3>
+<p>МК не может напрямую управлять обмотками (нужны амперы!). Нужен драйвер: A4988, DRV8825, TB6600.</p>
+<div class="formula">// С драйвером A4988:<br>digitalWrite(STEP, HIGH); delayMicroseconds(1000);<br>digitalWrite(STEP, LOW);  delayMicroseconds(1000);<br>// Один цикл HIGH/LOW = один шаг</div>
+
+<div class="tip-box">🔧 Применения: 3D-принтеры, ЧПУ-фрезеры, плоттеры, сканеры, телескопы. Точность без обратной связи — главное преимущество.</div>
+`},
+
+{q:"38. Энкодер",type:"sensors",a:`
+<h3>Что такое энкодер?</h3>
+<p>Энкодер — датчик, который преобразует вращение (или линейное перемещение) в электрические сигналы. По этим сигналам МК определяет угол поворота, скорость и направление вращения.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Инкрементальный энкодер с каналами A и B</div>${SVG.encoder}</div>
+
+<h3>Типы энкодеров</h3>
+
+<p><b>Инкрементальный</b> — даёт импульсы, считая их с нуля:</p>
+<ul>
+  <li>Два канала A и B со сдвигом 90°</li>
+  <li>По фазовому сдвигу определяем направление: A опережает B → CW, B опережает A → CCW</li>
+  <li>PPR (Pulses Per Revolution): 100, 400, 1024, 2048 и т.д.</li>
+</ul>
+
+<p><b>Абсолютный</b> — всегда знает точный угол (не теряет позицию при выключении):</p>
+<ul>
+  <li>Несколько дорожек на диске = двоичный код</li>
+  <li>Дорого, но надёжно</li>
+</ul>
+
+<h3>Подключение к МК</h3>
+<ul>
+  <li>Каналы A и B → на пины с поддержкой прерываний</li>
+  <li>Pull-up резисторы обязательны</li>
+  <li>Конденсатор 100 нФ на каждый сигнал от дребезга</li>
+</ul>
+
+<div class="formula">volatile int pos = 0;<br>ISR(INT0_vect) {<br>  if (digitalRead(B)) pos++; else pos--;<br>}</div>
+`},
+
+{q:"39. DC двигатель — управление от МК",type:"sensors",a:`
+<h3>Что такое DC двигатель?</h3>
+<p>DC (Direct Current) — обычный двигатель постоянного тока. Вращается пока на него подано напряжение. Скорость — пропорциональна напряжению. Направление — зависит от полярности.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// H-мост для управления DC двигателем</div>${SVG.dcMotor}</div>
+
+<h3>Почему нельзя подключить к GPIO напрямую?</h3>
+<ul>
+  <li>Двигатель потребляет 100 мА – несколько ампер</li>
+  <li>GPIO даёт максимум 40 мА → сгорит!</li>
+  <li>Двигатель генерирует обратную ЭДС при остановке → может повредить МК</li>
+</ul>
+
+<h3>H-мост — ключевой элемент</h3>
+<p>H-мост состоит из 4 транзисторных ключа. Разные комбинации включения меняют направление тока через двигатель.</p>
+<ul>
+  <li>Q1+Q4 включены → ток течёт влево → мотор вперёд</li>
+  <li>Q2+Q3 включены → ток течёт вправо → мотор назад</li>
+  <li>Все выключены → мотор свободно вращается</li>
+  <li>Q1+Q3 или Q2+Q4 — НЕЛЬЗЯ (короткое замыкание!)</li>
+</ul>
+
+<h3>Популярные драйверы</h3>
+<ul>
+  <li><b>L298N</b> — классика, до 2А, 7-46В. Есть на платах Arduino Motor Shield.</li>
+  <li><b>L293D</b> — маломощный, до 600 мА</li>
+  <li><b>DRV8833</b> — компактный, эффективный, до 1.5А</li>
+  <li><b>TB6612FNG</b> — лучше L298N, до 1.2А, нет нагрева</li>
+</ul>
+
+<div class="formula">// Управление скоростью через PWM:<br>analogWrite(ENA, 128);  // 50% скорость<br>digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); // вперёд</div>
+`},
+
+{q:"40. Внешняя память — расширение возможностей МК",type:"mcu",a:`
+<h3>Когда нужна внешняя память?</h3>
+<p>2 КБ SRAM и 32 КБ Flash ATmega328P иногда не хватает: хранение файлов, больших данных, логов. Тогда подключают внешнюю память.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Три типа памяти ATmega328P</div>${SVG.memoryMap}</div>
+
+<h3>Типы внешней памяти</h3>
+
+<p><b>SD-карта (через SPI)</b></p>
+<ul>
+  <li>Гигабайты данных</li>
+  <li>Файловая система FAT32</li>
+  <li>Подключение: SPI + CS</li>
+  <li>Библиотека: SD.h в Arduino</li>
+  <li>Применение: логирование данных, веб-сервер, медиаплеер</li>
+</ul>
+
+<p><b>Внешний Flash SPI (W25Q32, W25Q64 и т.д.)</b></p>
+<ul>
+  <li>4-64 МБ, быстрый</li>
+  <li>Подключение: SPI</li>
+  <li>Применение: хранение звуков, изображений, больших констант</li>
+</ul>
+
+<p><b>Внешний SRAM (через SPI или параллельно)</b></p>
+<ul>
+  <li>23LC1024: 128 КБ по SPI</li>
+  <li>Применение: большие буферы данных, звуковые буферы</li>
+</ul>
+
+<p><b>I2C EEPROM (AT24C256 и т.д.)</b></p>
+<ul>
+  <li>32 КБ – 512 КБ</li>
+  <li>Энергонезависима</li>
+  <li>Применение: конфигурация, калибровки</li>
+</ul>
+
+<div class="tip-box">💡 Хранение больших констант (таблицы, строки) — используйте PROGMEM в Flash самого МК! Это бесплатно и не нужно внешней микросхемы.</div>
+`},
+
+{q:"42. Flash-память микроконтроллера",type:"mcu",a:`
+<h3>Flash-память — где живёт программа</h3>
+<p>Flash — это энергонезависимая память, в которой хранится ваша программа (машинный код). При подаче питания МК начинает выполнять код с адреса 0x0000 Flash-памяти.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// Карта памяти ATmega328P</div>${SVG.memoryMap}</div>
+
+<h3>Организация Flash в ATmega328P</h3>
+<ul>
+  <li>Объём: 32 КБ (32768 байт)</li>
+  <li>Ширина слова: 16 бит (большинство команд AVR = 16 бит)</li>
+  <li>Итого: 16K слов (0x0000 – 0x3FFF)</li>
+  <li>Страница: 64 слова = 128 байт (минимальная единица стирания)</li>
+</ul>
+
+<h3>Структура Flash</h3>
+<ul>
+  <li><b>Таблица векторов прерываний</b> — адреса 0x0000-0x0033 (26 векторов)</li>
+  <li><b>Область приложения</b> — ваша программа</li>
+  <li><b>Boot Section</b> — загрузчик (0.5 КБ у Arduino) — в конце Flash</li>
+</ul>
+
+<h3>Как программировать Flash?</h3>
+<ul>
+  <li><b>ISP (In-System Programming)</b> — через SPI-программатор (USBasp, AVRISP)</li>
+  <li><b>JTAG</b> — через JTAG-интерфейс (для отладки)</li>
+  <li><b>Bootloader</b> — сам МК загружает программу через UART (Arduino IDE так и делает)</li>
+  <li><b>HV Programming</b> — высоковольтное программирование (когда заблокировали ISP fuse)</li>
+</ul>
+
+<div class="formula">// Чтение из Flash в программе (PROGMEM):<br>const uint8_t table[] PROGMEM = {1, 2, 3, 100};<br>uint8_t val = pgm_read_byte(&amp;table[2]);  // = 3</div>
+`},
+
+{q:"43. I2C EEPROM — внешняя энергонезависимая память",type:"interface",a:`
+<h3>I2C EEPROM — зачем?</h3>
+<p>Внутренний EEPROM ATmega328P = 1 КБ. Иногда этого мало: нужно хранить больше настроек, таблицы калибровок, строки. Внешний I2C EEPROM — простое решение: 2 провода, чипы дешёвые.</p>
+
+<div class="diagram-wrap"><div class="diagram-title">// I2C шина с EEPROM</div>${SVG.i2cDiagram}</div>
+
+<h3>Популярные микросхемы I2C EEPROM</h3>
+<ul>
+  <li><b>AT24C02</b> — 2 КБит = 256 байт</li>
+  <li><b>AT24C256</b> — 256 КБит = 32 КБайт</li>
+  <li><b>AT24C512</b> — 512 КБит = 64 КБайт</li>
+  <li><b>M24C64</b> (STMicroelectronics) — 64 КБит = 8 КБайт</li>
+</ul>
+
+<h3>Адресация AT24Cxx</h3>
+<p>Базовый I2C адрес: 0x50 (0b1010000). Пины A0, A1, A2 на корпусе позволяют выбрать один из 8 адресов (0x50-0x57). На одной шине можно иметь до 8 микросхем!</p>
+
+<h3>Как записать и прочитать байт</h3>
+<div class="formula">// Запись:<br>Wire.beginTransmission(0x50);  // выбор чипа<br>Wire.write((addr &gt;&gt; 8) & 0xFF); // старший байт адреса<br>Wire.write(addr & 0xFF);         // младший байт адреса<br>Wire.write(data);               // данные<br>Wire.endTransmission();<br>delay(5);  // ждём завершения записи!<br><br>// Чтение:<br>Wire.beginTransmission(0x50);<br>Wire.write((addr &gt;&gt; 8) & 0xFF);<br>Wire.write(addr & 0xFF);<br>Wire.endTransmission();<br>Wire.requestFrom(0x50, 1);<br>byte data = Wire.read();</div>
+
+<div class="warn-box">⚠️ После записи нужна задержка 5-10 мс. EEPROM медленная — не читайте сразу после записи без задержки!</div>
+`},
+
+];
+
+// ========== РЕНДЕР ==========
+function typeBadge(type) {
+  const map = {
+    interface: ['badge-interface', 'Интерфейс'],
+    mcu: ['badge-mcu', 'МК'],
+    control: ['badge-control', 'САУ'],
+    sensors: ['badge-sensors', 'Датчики'],
+  };
+  const [cls, label] = map[type] || ['badge-mcu', type];
+  return `<span class="type-badge ${cls}">${label}</span>`;
+}
+
+function render() {
+  const t = document.getElementById('search').value.toLowerCase();
+  const f = document.getElementById('filter').value;
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  const filtered = data.filter(d =>
+    (d.q.toLowerCase().includes(t) || d.a.toLowerCase().includes(t)) &&
+    (f === 'all' || d.type === f)
+  );
+
+  document.getElementById('count-badge').textContent = filtered.length + ' вопр.';
+  document.getElementById('fav-badge').textContent = '★ ' + fav.size;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">Ничего не найдено 🔍</div>';
+    return;
+  }
+
+  filtered.forEach(d => {
+    const num = d.q.match(/^\d+/)?.[0] || '?';
+    const title = d.q.replace(/^\d+\.\s*/, '');
+
+    const card = document.createElement('div');
+    card.className = 'question-card';
+
+    const isFav = fav.has(d.q);
+
+    card.innerHTML = `
+      <div class="question-header">
+        <span class="q-num">#${num}</span>
+        ${typeBadge(d.type)}
+        <span class="q-title">${title}</span>
+        <button class="star-btn ${isFav ? 'active' : ''}" data-q="${d.q}">${isFav ? '★' : '☆'}</button>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="answer-body">${d.a}</div>
+    `;
+
+    card.querySelector('.question-header').addEventListener('click', (e) => {
+      if (e.target.classList.contains('star-btn')) return;
+      card.classList.toggle('open');
+    });
+
+    card.querySelector('.star-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (fav.has(d.q)) fav.delete(d.q); else fav.add(d.q);
+      render();
+    });
+
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('filter').addEventListener('change', render);
+render();
+</script>
+</body>
+</html>
