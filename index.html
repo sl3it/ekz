@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -29,7 +30,6 @@ body {
   min-height: 100vh;
 }
 
-/* HEADER */
 header {
   background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0f172a 100%);
   border-bottom: 1px solid var(--border);
@@ -113,12 +113,57 @@ header {
   font-size: 11px;
 }
 
-/* MAIN */
 .container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 32px 24px;
 }
+
+/* LABS */
+.labs-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.labs-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.lab-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.lab-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lab-ext {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.ext-dch { background: rgba(124,58,237,0.2); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+.ext-dip { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
 
 /* QUESTION CARD */
 .question-card {
@@ -196,7 +241,6 @@ header {
 }
 .star-btn.active { color: #fbbf24; }
 
-/* ANSWER */
 .answer-body {
   display: none;
   padding: 0 20px 24px;
@@ -289,7 +333,6 @@ header {
   letter-spacing: 1px;
 }
 
-/* EMPTY */
 .empty {
   text-align: center;
   padding: 60px 20px;
@@ -323,7 +366,46 @@ header {
   </div>
 </header>
 
-<div class="container" id="list"></div>
+<div class="container">
+
+  <!-- ===== ЛАБОРАТОРНЫЕ РАБОТЫ ===== -->
+  <div class="labs-section">
+    <div class="labs-title">📁 Файлы лабораторных работ</div>
+    <a class="lab-link" href="labs/lab2.dch" download>
+      ⬇ lab2.dch <span class="lab-ext ext-dch">DCH · 311 KB</span>
+    </a>
+    <a class="lab-link" href="labs/laba14 maybe.dch" download>
+      ⬇ laba14 maybe.dch <span class="lab-ext ext-dch">DCH · 103 KB</span>
+    </a>
+    <a class="lab-link" href="labs/labvolt.dip" download>
+      ⬇ labvolt.dip <span class="lab-ext ext-dip">DIP · 312 KB</span>
+    </a>
+    <a class="lab-link" href="labs/wotofa.dip" download>
+      ⬇ wotofa.dip <span class="lab-ext ext-dip">DIP · 79 KB</span>
+    </a>
+    <a class="lab-link" href="labs/ви бьи.dip" download>
+      ⬇ ви бьи.dip <span class="lab-ext ext-dip">DIP · 80 KB</span>
+    </a>
+    <a class="lab-link" href="labs/мультиметр.dch" download>
+      ⬇ мультиметр.dch <span class="lab-ext ext-dch">DCH · 303 KB</span>
+    </a>
+    <a class="lab-link" href="labs/озу.dch" download>
+      ⬇ озу.dch <span class="lab-ext ext-dch">DCH · 151 KB</span>
+    </a>
+    <a class="lab-link" href="labs/озу2.dip" download>
+      ⬇ озу2.dip <span class="lab-ext ext-dip">DIP · 263 KB</span>
+    </a>
+    <a class="lab-link" href="labs/схема мльтивибраптор.dch" download>
+      ⬇ схема мльтивибраптор.dch <span class="lab-ext ext-dch">DCH · 3 KB</span>
+    </a>
+    <a class="lab-link" href="labs/шаговый.dch" download>
+      ⬇ шаговый.dch <span class="lab-ext ext-dch">DCH · 165 KB</span>
+    </a>
+  </div>
+  <!-- ===== КОНЕЦ ЛАБОРАТОРНЫХ ===== -->
+
+  <div id="list"></div>
+</div>
 
 <script>
 let fav = new Set();
